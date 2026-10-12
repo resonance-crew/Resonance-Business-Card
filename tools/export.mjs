@@ -8,6 +8,7 @@
  *   node tools/export.mjs meet facets         # some directions
  *   node tools/export.mjs meet --people=chen  # one person
  *   node tools/export.mjs meet --lang=zh      # a language option other than the direction's default
+ *   node tools/export.mjs facets --pose=met   # a still pose other than the direction's default (print/facets-met/)
  *
  * Writes print/<direction>/<person>.pdf and print/<direction>/<person>-front.png / -back.png.
  * Needs the folder served at http://127.0.0.1:4317.
@@ -26,6 +27,7 @@ const dirs = args.filter((a) => !a.startsWith('--'));
 const directions = dirs.length ? dirs : ALL;
 const people = flag('people')?.split(',') ?? PEOPLE;
 const lang = flag('lang');
+const pose = flag('pose');
 
 /** Trim + bleed in mm, read from the direction module (portrait or landscape). */
 function sizeOf(id) {
@@ -40,10 +42,10 @@ const chrome = await launch();
 try {
 for (const id of directions) {
   const [W, H] = sizeOf(id);
-  const outDir = path.join(ROOT, 'print', id + (lang ? `-${lang}` : ''));
+  const outDir = path.join(ROOT, 'print', id + (lang ? `-${lang}` : '') + (pose ? `-${pose}` : ''));
   fs.mkdirSync(outDir, { recursive: true });
   for (const p of people) {
-    const q = `d=${id}&p=${p}${lang ? `&lang=${lang}` : ''}`;
+    const q = `d=${id}&p=${p}${lang ? `&lang=${lang}` : ''}${pose ? `&pose=${pose}` : ''}`;
     const file = path.join(outDir, `${p}.pdf`);
     await chrome.pdf(`/?${q}&view=print&side=both`, file, { widthMm: W, heightMm: H });
     console.log('pdf ', path.relative(ROOT, file));

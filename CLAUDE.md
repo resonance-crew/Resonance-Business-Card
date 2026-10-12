@@ -17,7 +17,9 @@ ES modules don't load from `file://`; always serve the folder.
   toggles, the print proof (both faces flat with bleed and crop marks), the mission statement.
 - `card.html#<person>` — the digital card as a recipient sees it (one person, the direction in `js/share.js` `DIRECTION`):
   turn it over, save the contact (vCard), copy the e-mail, read what Resonance is. Speaks the visitor's language.
-  Hosted on GitHub Pages; every printed card's QR code opens its person's page (`CARD_BASE` in `js/people.js`).
+  Each person also has a short page, `<short>.html` (ncc, liball, nunu, ted), GENERATED from card.html by
+  `node tools/short-pages.mjs` (run it after editing card.html or js/people.js). Hosted on GitHub Pages at the custom
+  domain hi.resonance.channel (a DNS-only CNAME in Cloudflare); every printed card's QR code opens `CARD_BASE + short`.
 - `js/app.js` — the shell. `js/card3d.js` — the 3D card (Motion springs from jsDelivr: lean, glare,
   tap / drag / Enter / ← → to turn, painted edges). `js/blobs.js` — the metaball engine ported from
   the Resonance repo's `src/lib/design/driftingBlobs.ts` (canvas on screen, vector SVG for print).

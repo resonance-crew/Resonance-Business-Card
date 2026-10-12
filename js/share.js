@@ -10,6 +10,7 @@
 import { PEOPLE, BRAND, waveMark, cardUrl } from './people.js';
 import { createCard3D } from './card3d.js';
 import { makeCtx, faceParts, loadDirection, fontsSettled } from './ctx.js';
+import { organicButton, organicBare, organicDivider, organicLink, globeIcon } from './organic.js';
 
 /** The direction the team picked. */
 export const DIRECTION = 'facets';
@@ -52,8 +53,15 @@ const T = {
 
 const params = new URLSearchParams(location.search);
 const hash = location.hash.replace(/^#/, '');
-const personId = PEOPLE.some((p) => p.id === hash) ? hash : PEOPLE[0].id;
-const person = PEOPLE.find((p) => p.id === personId);
+const page = location.pathname.split('/').pop().replace(/\.html$/, '');
+const named = document.querySelector('meta[name="card-person"]')?.content;
+/** A short page names its person; else /ncc, #ncc or #chen; else the first. */
+const person =
+  PEOPLE.find((p) => p.id === named) ??
+  PEOPLE.find((p) => p.short === page) ??
+  PEOPLE.find((p) => p.id === hash || p.short === hash) ??
+  PEOPLE[0];
+const personId = person.id;
 const directionId = params.get('d') || DIRECTION;
 let ui = (params.get('ui') || navigator.language || 'zh').toLowerCase().startsWith('zh') ? 'zh' : 'en';
 
@@ -93,14 +101,14 @@ async function render() {
   current = { card, ctx, instance };
 
   $('#hint').textContent = t.hint;
-  $('#save').textContent = t.save;
-  $('#copy').textContent = t.copy;
-  $('#about-link').firstChild.textContent = t.about + ' ';
+  $('#save .o-label').textContent = t.save;
+  $('#copy .o-label').textContent = t.copy;
+  $('#about-link .o-label').firstChild.textContent = t.about + ' ';
   $('#about-link').href = `${BRAND.url}/${ui === 'zh' ? 'zh-TW' : 'en'}/about`;
   $('#about-title').textContent = t.aboutTitle;
   $('#mission').textContent = MISSION[ui];
   $('#email').textContent = person.email;
-  $('#lang').textContent = t.other;
+  $('#lang .lang-label').textContent = t.other;
   $('#lang').lang = ui === 'zh' ? 'en' : 'zh-Hant';
   $('#status').textContent = '';
   fontsSettled(card.stage).then(() => (document.documentElement.dataset.ready = '1'));
@@ -126,6 +134,15 @@ function vcard() {
 
 function init() {
   $('#brand-mark').innerHTML = waveMark('currentColor', 1.8);
+  // The Resonance site's hand-drawn controls (js/organic.js): filled wobbly buttons, the frameless
+  // globe, a wavy rule, a pen's wavy underline. Seeds are the site's own, one per element.
+  $('#lang').insertAdjacentHTML('afterbegin', globeIcon());
+  organicBare($('#lang'), { seed: 53 });
+  organicButton($('#save'), { variant: 'solid', seed: 3 });
+  organicButton($('#copy'), { variant: 'tonal', seed: 601 });
+  organicButton($('#about-link'), { variant: 'tonal', seed: 401 });
+  organicDivider($('#about-rule'), { seed: 17 });
+  organicLink($('#foot-link'));
   $('#save').addEventListener('click', () => {
     const blob = new Blob([vcard()], { type: 'text/vcard;charset=utf-8' });
     const a = document.createElement('a');

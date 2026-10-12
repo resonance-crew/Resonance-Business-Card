@@ -6,6 +6,7 @@
  *   person    one of PEOPLE;  brand, ink: the shared copy and palette
  *   lang      the language option picked (one of the direction's langs ids)
  *   grain     0–1, sand on the blobs (always 0 in print)
+ *   pose      the still/print frame picked, when the direction offers poses ([{ id, label }]; the first is the default)
  *   trim      [w, h] in mm;  bleed: 2 (mm);  box: the art layer in design units (0.1 mm), bleed included
  *   blobs     js/blobs.js;  qrSvg(text, opts);  waveMark(color, width)
  *   url       what the QR code opens (the person's digital card, card.html#<id>)
@@ -44,7 +45,7 @@ export function flatFace(side) {
  * @param mode   'live' | 'still' | 'print'
  * @param opts   { personId, lang, grain (bool), url, card, host }
  */
-export function makeCtx(dir, mode, { personId, lang, grain = true, url = null, card = null, host = null } = {}) {
+export function makeCtx(dir, mode, { personId, lang, grain = true, pose = null, url = null, card = null, host = null } = {}) {
   const trim = trimOf(dir);
   const person = PEOPLE.find((x) => x.id === personId) ?? PEOPLE[0];
   const stops = [];
@@ -57,6 +58,8 @@ export function makeCtx(dir, mode, { personId, lang, grain = true, url = null, c
     ink: INK,
     lang: lang && dir.langs.some((l) => l.id === lang) ? lang : dir.langs[0].id,
     grain: mode === 'print' ? 0 : grain ? 1 : 0,
+    // The frame still and print show, when the direction offers more than one (dir.poses); the first is its default.
+    pose: dir.poses?.length ? (dir.poses.some((p) => p.id === pose) ? pose : dir.poses[0].id) : null,
     trim,
     bleed: BLEED,
     box: { x: -BLEED * 10, y: -BLEED * 10, w: (trim[0] + 2 * BLEED) * 10, h: (trim[1] + 2 * BLEED) * 10 },

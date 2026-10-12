@@ -22,21 +22,32 @@
  * side. Nothing else reaches that edge.
  *
  * Each face also has a blob of its own in the one second ink (lavender, on
- * both faces) that meets the peach with a neck. Whenever a face comes into
- * view (the card arriving once its type is in, or a turn) that blob starts
- * GAP (7 mm) of bare paper away from the peach, measured for each person's
- * shapes at that moment, and closes the gap in MEET_TIME: the two touch,
- * the neck grows and melts (see MELT: the waist fills out into round
- * fillets, no crease), and the neck is then held.
- * Every frame the field along the line between the two centres is kept
- * above NECK_HOLD by easing the blob toward the peach just as far as it
- * needs, so the two never part while the lobes turn.
+ * both faces). Whenever a face comes into view (the card arriving once its
+ * type is in, or a turn) that blob starts GAP (7 mm) of bare paper away from
+ * the peach, measured for each person's shapes at that moment, and closes
+ * the gap in MEET_TIME: the two touch, the neck grows and melts (see MELT),
+ * and the lavender sinks into the peach and grows (see FUSE_IN, FUSE_GROW)
+ * and the form fills out to its soft hull (see FILL_SOFT): ONE rounded,
+ * convex form, the lavender at its narrower end, with no dent anywhere, so
+ * nothing is left of a waist (a pinched join read as a duck, a bird's head
+ * or a pacifier). Every frame the field along the line between the two
+ * centres is kept above NECK_HOLD by easing the blob toward the peach just
+ * as far as it needs, so the two never part while the lobes turn.
  *
- * Colour is two inks: the peach turns into the lavender across the waist,
- * through a warm blush (never the grey their overprint would make), over
- * about 15 mm once they have melted, and not at all while they are apart
- * (each ink flat). Screen and print use the same paint; print stays
- * vector, and `?plate=` renders one ink's separation for the spot / riso route.
+ * Colour is two inks. While they are apart, the sides that face each other
+ * already glow with the other ink (see GLOW: the peach blushes toward
+ * lavender, the lavender warms toward peach, strongest at the nearest edges,
+ * the far sides pure), more as the gap closes. Once they have melted the
+ * lavender is a rounded cap melting back into the peach through a warm
+ * blush (never the grey their overprint would make), about 15 mm wide along
+ * the form, its shades curving round the lavender's end (see
+ * HANDOVER_NEAR). Screen and print use the same paint (one two-circle radial
+ * gradient); print stays vector, and `?plate=` renders one ink's
+ * separation for the spot / riso route.
+ *
+ * The still card and the print file show one of two poses (`poses`):
+ * 'met' (已融合, the default: the rounded form the meeting rests in) or
+ * 'apart' (將相遇: the arrival's first frame, the glow across the gap).
  */
 
 const TAU = Math.PI * 2;
@@ -126,19 +137,25 @@ const MELT_BLUR = 30;
 const MELT_CELL = 8;
 
 /**
- * The colour hand-over, along the line from the peach's centre to the own
- * blob's: the own ink's share rises as a logistic in the odds of the way
- * along, centred on the waist (where the two blobs' own fields are equal),
- * HANDOVER steep once melted: at the still frame that is 15 to 16 mm from
- * 5 % to 95 % (12 mm from 10 % to 90 %, 20 mm from 1 % to 99 %) of the 24
- * to 25 mm between the centres, so the colour runs well into both lobes. Before
- * they touch it is a step in the bare paper between them (each ink flat),
- * and it widens with the melt. STOPS stops, evenly spaced in the curve.
+ * The colour hand-over: a melt, not a band. Each shade lies on a circle
+ * round the lavender's end (a two-circle radial gradient, see paintOf), so
+ * the lavender is a rounded cap melting back into the peach, its shades
+ * bowing toward the peach the way the form's narrow end does, instead of a
+ * stripe straight across it. Along the line from the peach's centre to the
+ * own blob's the circles cross from HANDOVER_NEAR[0] (on the peach's
+ * centre, so the shared edge is pure peach) to HANDOVER_NEAR[1] past the
+ * own blob's centre, and on the far side HANDOVER_FAR beyond it (0.1 mm);
+ * the own ink's share eases in across them as a smoothstep, flat at both
+ * ends (no ring where a pure ink begins), its middle on the waist (where the
+ * two blobs' own fields are equal): in the met pose about 15 mm from 5 % to
+ * 95 % along the line, so it runs from the peach's middle well into the
+ * lavender. It narrows toward a step at the waist while the melt comes in;
+ * until the melt is whole the glow (see GLOW) is handed over to it. STOPS
+ * stops, evenly spaced.
  */
-const HANDOVER = 1.8;
-const STOPS = 29;
-/** Where the stops end, in the curve's own units (σ(4.6) = 99 %); the end stops are the pure inks. */
-const HANDOVER_SPAN = 4.6;
+const HANDOVER_NEAR = [20, 55];
+const HANDOVER_FAR = [300, 800];
+const STOPS = 33;
 /**
  * How the inks mix across it (see inkSet): lightness and chroma straight
  * across, the chroma eased to MID_CHROMA of that in the middle, the hue
@@ -148,7 +165,64 @@ const HANDOVER_SPAN = 4.6;
 const MID_CHROMA = 0.85;
 const HUE_LAG = 1.4;
 
-/** Each face's own blob: where it rests once met, for the peach on that face's right or left. */
+/**
+ * The fusion. Once met, the own blob rests FUSE_IN of the way from its spot
+ * in OWN toward the peach's centre and FUSE_GROW times its size (it starts
+ * the meeting at 0.9), growing from GROW_FROM of the way through the meeting
+ * on: it sinks in as it grows, so the one form keeps both areas (about 1.1 ×
+ * the two apart) and its outline stays clear of the shared edge.
+ */
+const FUSE_IN = 0.25;
+const FUSE_GROW = 1.2;
+const GROW_FROM = 0.45;
+
+/**
+ * The fill. Even melted, the outline still dips in each side of the waist,
+ * and a big round shape on a small one with a dip between reads as a head
+ * on a neck (a duck, a bird's head, a pacifier). So once they have melted
+ * the form becomes its own soft hull: one rounded form, the lavender at its
+ * narrower end, with no hollow anywhere. The soft hull is the convex hull
+ * made round: in every direction it reaches as far as the outline does,
+ * softened over FILL_SOFT (a log-sum of the outline's reach, by length), so
+ * where the hull would run straight across a dip, or from one blob to the
+ * other, it bows gently outward instead, and where a single lobe stands out
+ * it is a little rounder than the lobe. It is convex and smooth everywhere,
+ * and it moves smoothly with the shapes (nothing in it is picked from one
+ * frame to the next), so the tide never makes it twitch. The field is
+ * replaced by the form's own, the outline's level on its edge rising
+ * FILL_SLOPE per 0.1 mm in from it (about the blobs' own slope at their
+ * outline). The peach is taken in whole (both halves, as it runs round the
+ * shared edge), and in the still and print poses the other face's lavender
+ * too, carried across that edge as the spread lays it (see hullsOf): the
+ * two faces are then halves of one form, which meets itself on the edge
+ * exactly and stays convex across it. It comes in with the melt (on screen
+ * over the melt's second).
+ * FILL_ROUND is how round a stretch of outline is that keeps its place
+ * (rounder grows a little, tighter shrinks a little); FILL_DIRS how many
+ * directions the outline is found in.
+ */
+const FILL_SOFT = 30;
+const FILL_ROUND = 120;
+const FILL_DIRS = 240;
+const FILL_SLOPE = 0.012;
+/** How far past the peach's own outline the face's takes over from it, in field (see hullsOf). */
+const FILL_MARGIN = 0.05;
+
+/**
+ * The glow across the gap, while the two are apart: each blob's side toward
+ * the other takes the other's ink, GLOW_PEAK of the hand-over (½ = halfway)
+ * at the middle of the gap, falling off as (1 − (d / GLOW_REACH)²)² with the
+ * distance d from there, GLOW_WIDE times as far across the gap as along it
+ * (so it covers the side that faces, not a spot): with the 7 mm gap about
+ * 42 % at the nearest edges, 13 % 5 mm in, nothing 8 mm in, and halfway as
+ * they touch, where the melt's own hand-over takes over (over MELT_TIME).
+ */
+const GLOW_PEAK = 0.5;
+const GLOW_REACH = 120;
+const GLOW_WIDE = 1.4;
+const GLOW_STOPS = 13;
+
+/** Each face's own blob: where it would rest before it sinks in, for the peach on that face's right or left. */
 const OWN = {
   zh: { R: 96, seed: 5, tidePhase: 0, right: [290, 586], left: [250, 586] },
   en: { R: 92, seed: 9, tidePhase: 2, left: [248, 486], right: [292, 486] },
@@ -178,18 +252,21 @@ function outward(face, edge) {
 
 /**
  * A face's own blob, `m` of the way through its meeting (0: `travel` further
- * out than its rest, a little smaller; 1: at rest), shifted `tide` toward the peach.
+ * out than its spot in OWN, at 0.9 of its size; 1: at rest, sunk FUSE_IN of
+ * the way toward the peach's centre and FUSE_GROW its size), shifted `tide`
+ * toward the peach.
  */
 function ownBlob(B, seed, face, edge, m, tide, travel = TRAVEL) {
   const o = OWN[face];
   const [nx, ny] = o[edge];
   const [ux, uy] = outward(face, edge);
   const k = B.smoothstep(m);
-  const out = travel * (1 - k) - tide;
+  const sink = Math.hypot(nx - (edge === 'right' ? 540 : 0), ny - 520) * FUSE_IN;
+  const out = B.lerp(travel, -sink, k) - tide;
   return {
     x: nx + ux * out,
     y: ny + uy * out,
-    R: o.R * B.lerp(0.9, 1, k),
+    R: o.R * B.lerp(0.9, FUSE_GROW, B.smoothstep((m - GROW_FROM) / (1 - GROW_FROM))),
     seed: seed + o.seed,
     pace: 1,
   };
@@ -327,11 +404,18 @@ function readGrid(gr, x, y) {
 
 /**
  * A frame's field on a grid: the two blobs' own (blobs.sampleField), plus
- * the melt round the own blob (the smaller: nowhere else are both near).
- * The grid's outer ring stays 0, so outlines close.
+ * the melt round the own blob (the smaller: nowhere else are both near),
+ * then the fill over the join (see FILL_SLOPE). The grid's outer ring
+ * stays 0, so outlines close.
  */
 function sampleFrame(B, fr, t, g) {
   B.sampleField(fr.list, t, g);
+  sampleMelt(B, fr, t, g);
+  fillWaist(B, fr, t, g, fr.fill);
+}
+
+/** The melt (see MELT), added to the field on the grid. */
+function sampleMelt(B, fr, t, g) {
   const k = MELT * fr.melt;
   if (k <= 0) return;
   // Where the own blob's field reaches (a lobe's reaches √2 × its radius), then three blurs further:
@@ -370,6 +454,219 @@ function sampleFrame(B, fr, t, g) {
   }
 }
 
+// ── the fill over the join ──────────────────────────────────────────────
+
+/** The blobs' lobes at t as [x, y, 1 / reach², weight], for fieldOf. */
+function lobeList(B, blobs, t) {
+  const out = [];
+  for (const b of blobs) {
+    for (const p of B.lobesAt(b, t)) {
+      const rho = p.r * Math.SQRT2;
+      out.push([p.x, p.y, 1 / (rho * rho), p.w]);
+    }
+  }
+  return out;
+}
+
+/** The field of a lobe list at (x, y): what blobs.fieldAt gives, without recomputing the lobes. */
+function fieldOf(L, x, y) {
+  let f = 0;
+  for (const [lx, ly, inv, w] of L) {
+    const u = ((x - lx) ** 2 + (y - ly) ** 2) * inv;
+    if (u < 1) f += w * (1 - u) * (1 - u);
+  }
+  return f;
+}
+
+/**
+ * Points [x, y, ds, …] of traced loops, each with its share of the loop's
+ * length, times `weight(x, y)` (0 … 1) when given.
+ */
+function weighted(loops, weight = null) {
+  const out = [];
+  for (const l of loops) {
+    const n = l.length / 2;
+    if (n < 3) continue;
+    for (let i = 0; i < n; i++) {
+      const x = l[2 * i];
+      const y = l[2 * i + 1];
+      const k = weight ? weight(x, y) : 1;
+      if (k <= 0) continue;
+      const a = 2 * ((i + n - 1) % n);
+      const b = 2 * ((i + 1) % n);
+      const ds = (Math.hypot(x - l[a], y - l[a + 1]) + Math.hypot(l[b] - x, l[b + 1] - y)) / 2;
+      out.push(x, y, ds * k);
+    }
+  }
+  return out;
+}
+
+/**
+ * The soft hull of weighted points (see FILL_SOFT), as its outline
+ * [x0, y0, …] counter-clockwise at FILL_DIRS directions: its support in
+ * each direction is the log of the sum of e^(reach / FILL_SOFT) over the
+ * outline, by length, so it takes in the whole shape, runs along it where
+ * it is round, and where the hull would cross a dip (or meet the other
+ * blob) it bows outward, more the wider the dip. The outline is the
+ * envelope of those supporting lines (x = h n + h′ n′), smooth and convex.
+ */
+function softHull(pts) {
+  const n = pts.length / 3;
+  const out = [];
+  if (n < 3) return out;
+  const tau = FILL_SOFT;
+  // Normalised so a stretch of outline as round as FILL_ROUND keeps its place.
+  const norm = tau * Math.log(Math.sqrt(2 * Math.PI * tau * FILL_ROUND));
+  for (let k = 0; k < FILL_DIRS; k++) {
+    const a = (TAU * k) / FILL_DIRS;
+    const cx = Math.cos(a);
+    const cy = Math.sin(a);
+    let m = -Infinity;
+    for (let i = 0; i < 3 * n; i += 3) {
+      const r = pts[i] * cx + pts[i + 1] * cy;
+      if (r > m) m = r;
+    }
+    let sw = 0;
+    let st = 0;
+    for (let i = 0; i < 3 * n; i += 3) {
+      const r = pts[i] * cx + pts[i + 1] * cy;
+      if (r < m - 12 * tau) continue;
+      const w = pts[i + 2] * Math.exp((r - m) / tau);
+      sw += w;
+      st += w * (-pts[i] * cy + pts[i + 1] * cx);
+    }
+    const h = m + tau * Math.log(sw) - norm;
+    const ht = st / sw;
+    out.push(h * cx - ht * cy, h * cy + ht * cx);
+  }
+  return out;
+}
+
+/**
+ * The form the fill is made of (see FILL_SOFT), read off the field on the
+ * grid `g` (the blobs and the melt): the soft hull of the peach's own
+ * outline (its whole shape, both halves, as it runs round the shared edge)
+ * and of the face's own outline where it runs outside the peach's. With
+ * `fr.partner` (the other face's frame, in the still and print poses) that
+ * face's outline is taken in too, carried across the shared edge as the
+ * spread lays it: both faces then show halves of one form, which meets
+ * itself on the edge exactly and stays convex across it.
+ */
+function hullsOf(B, fr, t, g) {
+  const { W } = fr;
+  const gp = B.makeGrid({ x: W.x - 2 * W.R, y: W.y - 2 * W.R, w: 4 * W.R, h: 4 * W.R }, g.cell);
+  B.sampleField([W], t, gp);
+  const LW = lobeList(B, [W], t);
+  // Each face: its grid, which side of the shared edge it lies on, and how far it is carried into this face's place.
+  const faces = [{ g, side: Math.sign(fr.O.x - W.x) || 1, dx: 0 }];
+  const P = fr.partner;
+  if (P) {
+    const gq = { cell: g.cell, x0: g.x0, y0: g.y0, nx: g.nx, ny: g.ny, v: new Float32Array(g.v.length) };
+    B.sampleField(P.list, t, gq);
+    sampleMelt(B, P, t, gq);
+    faces.push({ g: gq, side: Math.sign(P.O.x - P.W.x) || 1, dx: W.x - P.W.x });
+  }
+  const pts = [];
+  for (const { g: gf, side, dx } of faces) {
+    // The face's outline where it runs outside the peach's own: and the peach's own where the face's hasn't
+    // swallowed it (each fading over the same margin, so where the two run together they count once).
+    const rest = weighted(B.traceContours(gf), (x, y) => ((x - W.x + dx) * side > 0 ? B.smoothstep((B.ISO - fieldOf(LW, x + dx, y)) / FILL_MARGIN) : 0));
+    for (let i = 0; i < rest.length; i += 3) pts.push(rest[i] + dx, rest[i + 1], rest[i + 2]);
+  }
+  const kept = weighted(B.traceContours(gp), (x, y) => {
+    for (const { g: gf, side, dx } of faces) if ((x - W.x) * side > 0) return 1 - B.smoothstep((readGrid(gf, x - dx, y) - B.ISO) / FILL_MARGIN);
+    return 1;
+  });
+  return { form: softHull(kept.concat(pts)) };
+}
+
+/**
+ * The field of a convex polygon (counter-clockwise): the outline's level
+ * on its edge, rising FILL_SLOPE per 0.1 mm in from it and falling as much
+ * out (to `band` out, then held), at (x, y). `E` is the polygon as edges
+ * (see edgesOf).
+ */
+function polyField(B, E, x, y, band) {
+  let d = Infinity;
+  for (let k = 0; k < E.length; k += 3) {
+    const s = E[k] * x + E[k + 1] * y - E[k + 2];
+    if (s < d) {
+      d = s;
+      if (d < -band) return B.ISO - FILL_SLOPE * band;
+    }
+  }
+  return B.ISO + FILL_SLOPE * d;
+}
+
+/** A convex polygon (counter-clockwise) as its edges' inward unit normals and offsets: inside, every n·p − c ≥ 0. */
+function edgesOf(poly) {
+  const n = poly.length / 2;
+  const E = new Float64Array(3 * n);
+  for (let i = 0; i < n; i++) {
+    const ax = poly[2 * i];
+    const ay = poly[2 * i + 1];
+    const bx = poly[2 * ((i + 1) % n)];
+    const by = poly[2 * ((i + 1) % n) + 1];
+    const L = Math.hypot(bx - ax, by - ay) || 1;
+    const qx = -(by - ay) / L;
+    const qy = (bx - ax) / L;
+    E[3 * i] = qx;
+    E[3 * i + 1] = qy;
+    E[3 * i + 2] = qx * ax + qy * ay;
+  }
+  return E;
+}
+
+/**
+ * The join, filled (see FILL_SOFT), `w` of the way: the field becomes the
+ * form's own (the soft hull's).
+ */
+function fillWaist(B, fr, t, g, w) {
+  if (w <= 0) return;
+  const { form } = hullsOf(B, fr, t, g);
+  if (form.length < 6) return;
+  const E = edgesOf(form);
+  const { v, nx, ny, cell } = g;
+  const band = 3 * cell;
+  const top = B.ISO + FILL_SLOPE * band;
+  let x0 = Infinity;
+  let x1 = -Infinity;
+  let y0 = Infinity;
+  let y1 = -Infinity;
+  for (let i = 0; i < form.length; i += 2) {
+    x0 = Math.min(x0, form[i]);
+    x1 = Math.max(x1, form[i]);
+    y0 = Math.min(y0, form[i + 1]);
+    y1 = Math.max(y1, form[i + 1]);
+  }
+  // Everything the raw shape covers is in the box too: a lobe standing out of the form is taken back in.
+  for (let j = 1; j < ny - 1; j++) {
+    for (let i = 1; i < nx - 1; i++) {
+      if (v[j * nx + i] < B.ISO - FILL_SLOPE * band) continue;
+      const x = g.x0 + i * cell;
+      const y = g.y0 + j * cell;
+      if (x < x0) x0 = x;
+      if (x > x1) x1 = x;
+      if (y < y0) y0 = y;
+      if (y > y1) y1 = y;
+    }
+  }
+  const i0 = Math.max(1, Math.floor((x0 - band - g.x0) / cell));
+  const i1 = Math.min(nx - 2, Math.ceil((x1 + band - g.x0) / cell));
+  const j0 = Math.max(1, Math.floor((y0 - band - g.y0) / cell));
+  const j1 = Math.min(ny - 2, Math.ceil((y1 + band - g.y0) / cell));
+  for (let j = j0; j <= j1; j++) {
+    const y = g.y0 + j * cell;
+    for (let i = i0; i <= i1; i++) {
+      const o = j * nx + i;
+      const s = polyField(B, E, g.x0 + i * cell, y, band);
+      // Deep inside, nothing to change (the raw field is above the outline there too).
+      if (v[o] >= top && s >= top) continue;
+      v[o] += (s - v[o]) * w;
+    }
+  }
+}
+
 /**
  * Where the inks hand over, as a share of the way from the peach's centre
  * to the own blob's: where each blob's own field is equal (while they are
@@ -396,23 +693,36 @@ function waistOf(B, W, O, t) {
 }
 
 /**
- * The paint: a linear gradient along the line between the two centres,
- * as stops [s, v] (v = the own ink's share, 0 peach … 1 the partner),
- * centred on the waist and as wide as the melt has come (see HANDOVER).
+ * The paint: a two-circle radial gradient from `focal` (the partner's
+ * end) to `end` (the peach's), as stops [offset, v] (v = the own ink's
+ * share, 0 peach … 1 the partner), its middle on the waist and as wide as
+ * the melt has come (see HANDOVER_NEAR).
  */
 function paintOf(B, W, O, t, melt) {
   const sw = Math.min(0.999, Math.max(0.001, waistOf(B, W, O, t)));
-  const centre = Math.log(sw / (1 - sw));
-  const width = Math.max(0.02, melt) / HANDOVER;
-  const sig = (u) => 1 / (1 + Math.exp(-u));
-  const lo = sig(-HANDOVER_SPAN);
-  const hi = sig(HANDOVER_SPAN);
+  const D = Math.hypot(O.x - W.x, O.y - W.y) || 1;
+  const ux = (O.x - W.x) / D;
+  const uy = (O.y - W.y) / D;
+  const waist = D * sw;
+  // Where the circles cross the line on the near side (from the peach's centre), drawn in toward the
+  // waist while the melt comes in; on the far side, HANDOVER_FAR beyond the own blob's centre.
+  const k = Math.max(0.02, melt);
+  const near0 = waist + (HANDOVER_NEAR[0] - waist) * k;
+  const near1 = waist + (D + HANDOVER_NEAR[1] - waist) * k;
+  const circle = (near, far) => ({ x: W.x + ux * ((near + far) / 2), y: W.y + uy * ((near + far) / 2), r: (far - near) / 2 });
+  const focal = circle(near1, D + HANDOVER_FAR[0]);
+  const end = circle(near0, D + HANDOVER_FAR[1]);
+  // Offsets run from the focal circle (the partner, 1) to the end circle (the peach, 0); the share is a
+  // smoothstep in them, bent so its middle falls on the waist.
+  const mid = Math.min(0.95, Math.max(0.05, (near1 - waist) / (near1 - near0 || 1)));
+  const bend = Math.log(0.5) / Math.log(mid);
   const stops = [];
-  for (let k = 0; k < STOPS; k++) {
-    const u = -HANDOVER_SPAN + (2 * HANDOVER_SPAN * k) / (STOPS - 1);
-    stops.push([sig(centre + u * width), (sig(u) - lo) / (hi - lo)]);
+  for (let i = 0; i < STOPS; i++) {
+    const o = i / (STOPS - 1);
+    const q = o ** bend;
+    stops.push([o, 1 - q * q * (3 - 2 * q)]);
   }
-  return { x1: W.x, y1: W.y, x2: O.x, y2: O.y, cx: W.x + (O.x - W.x) * sw, cy: W.y + (O.y - W.y) * sw, stops };
+  return { focal, end, stops, cx: W.x + ux * waist, cy: W.y + uy * waist };
 }
 
 /** The hold, one frame on: eased toward what the neck needs, at a calm rate. */
@@ -441,14 +751,153 @@ function frameOf(B, { seed, face, edge, t, m, tide, pull, melt, travel }) {
   const neck = neckOf(B, W, O, t);
   const meltTo = meltOf(B, neck);
   const k = Math.min(meltTo, melt ?? meltTo);
-  return { W, O, need, neck, meltTo, melt: k, list: [W, O], paint: paintOf(B, W, O, t, k) };
+  // The fill comes in with the melt.
+  return { W, O, need, neck, meltTo, melt: k, fill: k, list: [W, O], paint: paintOf(B, W, O, t, k) };
+}
+
+// ── the glow across the gap ─────────────────────────────────────────────
+
+/** Whether (x, y) lies inside a traced loop [x0, y0, x1, y1, …]. */
+function inLoop(l, x, y) {
+  let inside = false;
+  const n = l.length / 2;
+  for (let i = 0, j = n - 1; i < n; j = i++) {
+    const xi = l[2 * i];
+    const yi = l[2 * i + 1];
+    const xj = l[2 * j];
+    const yj = l[2 * j + 1];
+    if (yi > y !== yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi) inside = !inside;
+  }
+  return inside;
+}
+
+/**
+ * While the two are apart (their outlines two loops): which loops are the
+ * peach's and which the own blob's, and the glow's centre, the middle of
+ * the bare paper between the two outlines' nearest points (`gap` across).
+ * Null once they touch.
+ */
+function glowOf(fr, loops) {
+  if (loops.length < 2) return null;
+  const own = loops.findIndex((l) => inLoop(l, fr.O.x, fr.O.y));
+  if (own < 0 || inLoop(loops[own], fr.W.x, fr.W.y)) return null;
+  // Every other loop is the peach's (a stray one beside the own blob goes with it).
+  const sideOf = loops.map((l, i) => {
+    if (i === own) return 1;
+    const dW = Math.hypot(l[0] - fr.W.x, l[1] - fr.W.y) / fr.W.R;
+    const dO = Math.hypot(l[0] - fr.O.x, l[1] - fr.O.y) / fr.O.R;
+    return dO < dW ? 1 : 0;
+  });
+  const a = loops.filter((_, i) => sideOf[i] === 0).flat();
+  const b = loops[own];
+  if (!a.length) return null;
+  let best = Infinity;
+  let pa = 0;
+  let pb = 0;
+  for (let j = 0; j < b.length; j += 2) {
+    for (let i = 0; i < a.length; i += 2) {
+      const q = (a[i] - b[j]) ** 2 + (a[i + 1] - b[j + 1]) ** 2;
+      if (q < best) {
+        best = q;
+        pa = i;
+        pb = j;
+      }
+    }
+  }
+  const gap = Math.sqrt(best);
+  // Across the gap: from the peach's nearest point to the own blob's (or the centres' line, should they meet).
+  let ux = b[pb] - a[pa];
+  let uy = b[pb + 1] - a[pa + 1];
+  if (gap < 1) {
+    ux = fr.O.x - fr.W.x;
+    uy = fr.O.y - fr.W.y;
+  }
+  const ul = Math.hypot(ux, uy) || 1;
+  return { x: (a[pa] + b[pb]) / 2, y: (a[pa + 1] + b[pb + 1]) / 2, gap, ux: ux / ul, uy: uy / ul, sideOf };
+}
+
+/** How far toward the other ink the point (x, y) is, by the glow about `glow`'s centre (see GLOW). */
+function glowAt(glow, x, y) {
+  const dx = x - glow.x;
+  const dy = y - glow.y;
+  const along = dx * glow.ux + dy * glow.uy;
+  const across = (dy * glow.ux - dx * glow.uy) / GLOW_WIDE;
+  const q = (along * along + across * across) / (GLOW_REACH * GLOW_REACH);
+  if (q >= 1) return 0;
+  return GLOW_PEAK * (1 - q) * (1 - q);
+}
+
+/** The glow's ellipse as a transform of a circle GLOW_REACH round the origin: [a, b, c, d, e, f]. */
+function glowMatrix(glow) {
+  const { x, y, ux, uy } = glow;
+  return [ux, uy, -uy * GLOW_WIDE, ux * GLOW_WIDE, x, y];
+}
+
+/** The glow as stops [offset, share] of a radial gradient GLOW_REACH wide, for the peach (`own` false) or the own blob. */
+function glowStops(own) {
+  const stops = [];
+  for (let k = 0; k < GLOW_STOPS; k++) {
+    const u = k / (GLOW_STOPS - 1);
+    const g = GLOW_PEAK * (1 - u * u) ** 2;
+    stops.push([u, own ? 1 - g : g]);
+  }
+  return stops;
+}
+
+/** The hand-over's share at (x, y): the linear gradient of `paint`, read off its stops. */
+function shareAt(paint, x, y) {
+  const { focal: F, end: E, stops } = paint;
+  // The largest s whose circle (F → E, centre and radius straight between) passes through (x, y), as a
+  // radial gradient paints it.
+  const dcx = E.x - F.x;
+  const dcy = E.y - F.y;
+  const dr = E.r - F.r;
+  const px = x - F.x;
+  const py = y - F.y;
+  const a = dcx * dcx + dcy * dcy - dr * dr;
+  const b = px * dcx + py * dcy + F.r * dr;
+  const c = px * px + py * py - F.r * F.r;
+  let s = 0;
+  if (Math.abs(a) < 1e-9) s = c / (2 * b || 1);
+  else {
+    const q = Math.sqrt(Math.max(0, b * b - a * c));
+    const r1 = (b + q) / a;
+    const r2 = (b - q) / a;
+    s = -Infinity;
+    for (const r of [r1, r2]) if (F.r + r * dr >= 0 && r > s) s = r;
+    if (s === -Infinity) s = 0;
+  }
+  if (s <= stops[0][0]) return stops[0][1];
+  for (let i = 1; i < stops.length; i++) {
+    if (s <= stops[i][0]) {
+      const [s0, v0] = stops[i - 1];
+      const [s1, v1] = stops[i];
+      return v0 + ((v1 - v0) * (s - s0)) / (s1 - s0 || 1);
+    }
+  }
+  return stops[stops.length - 1][1];
+}
+
+/**
+ * The frame the still card and the print file show for a pose: 'apart'
+ * (the arrival's first frame: the gap measured, nothing pulled, nothing
+ * melted) or anything else, 'met' (the rounded form the meeting rests in).
+ */
+function stillFrame(B, { seed, face, edge, pose }) {
+  const t = STILL_TIME;
+  if (pose === 'apart') return frameOf(B, { seed, face, edge, t, m: 0, tide: 0, pull: 0, melt: 0, travel: travelFor(B, seed, face, edge, t) });
+  // Met: one form across the spread, so the other face is part of it too (see hullsOf).
+  const fr = frameOf(B, { seed, face, edge, t, m: 1, tide: TIDE });
+  fr.partner = frameOf(B, { seed, face: face === 'zh' ? 'en' : 'zh', edge: edge === 'right' ? 'left' : 'right', t, m: 1, tide: TIDE });
+  return fr;
 }
 
 /** What tools (and nothing else) read: the same functions the card draws with. */
 export const geometry = {
-  OWN, GAP, TRAVEL, MEET_TIME, NECK_HOLD, PULL_MAX, MELT, MELT_BLUR, MELT_TIME, HANDOVER, HOLD_FROM, TIDE,
+  OWN, GAP, TRAVEL, MEET_TIME, NECK_HOLD, PULL_MAX, MELT, MELT_BLUR, MELT_TIME, HANDOVER_NEAR, HANDOVER_FAR, HOLD_FROM, TIDE,
   easePull, easeMelt, wrapped, ownBlob, outward, outlinePoints, travelFor, toward, neckOf, needOf, holdOf,
-  meltOf, blurredShape, readGrid, sampleFrame, waistOf, paintOf, frameOf, inkSet, outlineOf,
+  meltOf, blurredShape, readGrid, sampleFrame, waistOf, paintOf, shareAt, frameOf, inkSet, outlineOf,
+  FUSE_IN, FUSE_GROW, GLOW_PEAK, GLOW_REACH, hullsOf, fillWaist, glowOf, glowAt, stillFrame,
 };
 
 // ── the direction ───────────────────────────────────────────────────────
@@ -465,11 +914,15 @@ export default {
   edgePaint: { r: EDGE_PEACH },
   turnDir: -1,
   proofSpread: true,
-  pitch: '人，生而立體：同一個人，一面直排中文、一面英文；一團桃色穿過名片刷了色的長邊，翻過來接到另一面，再和那一面的薰衣草融成一團',
+  pitch: '人，生而立體：同一個人，一面直排中文、一面英文；一團桃色穿過名片刷了色的長邊，翻過來接到另一面，那一面的薰衣草隔著白紙先泛起彼此的顏色，再和它融成一個圓潤的形狀',
   notes: [
     {
       k: '概念',
-      v: '桃色從正面的右緣穿出、接到背面的左緣：名片翻過來，這兩條是同一條邊、同一個高度，所以是同一個形狀穿過紙的厚度。那條長邊整條刷成桃色，翻面時它朝你轉過來；攤開時正背並排，兩半在中縫拼回一整團。每面另有一團薰衣草，每次翻到一面，它都先隔著 7 mm 的白紙，再靠過來和桃色融成一個形狀：腰身兩側是圓潤的弧，沒有折角，顏色經過暖玫瑰色，在約 15 mm 間慢慢轉成薰衣草。',
+      v: '桃色從正面的右緣穿出、接到背面的左緣：名片翻過來，這是同一條邊，所以是同一個形狀穿過紙的厚度。那條長邊整條刷成桃色，翻面時朝你轉過來；攤開時正背兩半在中縫拼回一整團。每面另有一團薰衣草，靠過來和桃色融成一個圓潤的整體，顏色順著形狀的弧度，經過暖玫瑰色在約 15 mm 間融回桃色。',
+    },
+    {
+      k: '靜態版',
+      v: '靜態與印刷有兩個畫面可選。預設「已融合」：兩團融成一個圓潤的整體，整圈輪廓外凸，接合處沒有凹口，正背兩面在中縫完全接上。「將相遇」：兩團還隔著 7 mm 的白紙，面對面的邊緣先泛起對方的顏色，像什麼正要發生。數位名片則每次播完整段相遇，最後停在「已融合」。',
     },
     {
       k: '語言',
@@ -481,16 +934,21 @@ export default {
     },
     {
       k: '印刷',
-      v: '印刷檔只有油墨，紙色不印：QR 碼後面沒有紙色底，落款印裡的邊線與波紋是鏤空。四個顏色：桃、薰衣草、赤陶（落款印與波紋）、暖黑（字與 QR 碼）；印刷檔裡的小字一律實色暖黑，不用灰網。基本報價走數位 CMYK：兩張 300 gsm 棉紙印好對裱成約 0.8 mm，整疊夾齊後只刷共用的那條長邊，用調成桃色的色漆，每個名字同一道工序，不用遮罩。融色是一條 29 階的向量漸層，中段是暖玫瑰色（約 oklch 86% 0.055 8.5°）；粉彩轉 CMYK 會略灰，薰衣草最明顯，要先打樣。進階選項是專色或 Riso：桃色與薰衣草各一版（各出一張灰階分色稿），腰身約 15 mm 的漸層由兩色疊印，中段會比螢幕上的玫瑰色灰一些；Riso 套印約有 0.5 到 1 mm 的偏移，交接帶手工感；落款印改赤陶專色或凹印。QR 碼 14 mm。',
+      v: '只印油墨，紙色交給紙張。四個顏色：桃、薰衣草、赤陶（落款印與波紋）、暖黑（字與 QR 碼），小字一律用實色。基本作法是數位 CMYK：兩張 300 gsm 棉紙對裱成約 0.8 mm，裁好後只刷共用的那條長邊，每個名字同一道工序。融色是向量漸層，沒有點陣圖；粉彩轉 CMYK 會略灰，薰衣草最明顯，請先打樣。進階可以用專色或 Riso 兩色疊印出融色，中段會比螢幕上灰一些。QR 碼 14 mm。',
     },
     {
       k: '動態',
-      v: '每次一面轉到眼前（包括名片剛出現、字型載入之後），那一面的薰衣草都先隔著 7 mm 的白紙，2.6 秒內靠過來：約 1.2 到 1.9 秒碰到桃色、長出頸部，再用約 1 秒融開，腰身長出圓弧，顏色從交界向兩邊暈開；碰到之前兩色都是平塗。之後頸部一直相連。桃色以 10 秒的週期呼吸，兩面共用一個時鐘；薰衣草隨 13 秒的潮汐微微進退，腰身時寬時窄但不會斷。靜態與印刷固定在融開之後的那一刻。',
+      v: '每次一面轉到眼前，那一面的薰衣草先隔著 7 mm 的白紙、邊緣泛著彼此的顏色，在 2.6 秒內靠過來，約 1 秒時碰到，再約 1 秒長成一個圓潤的整體。之後桃色以 10 秒的週期呼吸，薰衣草隨 13 秒的潮汐微微進退，輪廓輕輕起伏，不會再收出腰身。',
     },
   ],
   langs: [
     { id: 'zh-first', label: '中文面在前' },
     { id: 'en-first', label: '英文面在前' },
+  ],
+  // The frame the still card and the print file show (the first is the default).
+  poses: [
+    { id: 'met', label: '已融合' },
+    { id: 'apart', label: '將相遇' },
   ],
   stillTime: STILL_TIME,
 
@@ -523,15 +981,15 @@ export default {
 
     const animated = ctx.live;
     const seed = person.seed;
-    const tideOf = (k, t) => (animated ? TIDE * Math.sin((TAU * t) / TIDE_PERIOD + OWN[k].tidePhase) : TIDE);
+    const tideOf = (k, t) => TIDE * Math.sin((TAU * t) / TIDE_PERIOD + OWN[k].tidePhase);
 
-    // ── print: vector, two inks (or one plate), met ──
+    // The still card and the print file show one pose: 'apart', or (anything else) 'met'.
+    const pose = ctx.pose === 'apart' ? 'apart' : 'met';
+    const still = (k) => stillFrame(B, { seed, face: k, edge: edge[k], pose });
+
+    // ── print: vector, two inks (or one plate), in the pose picked ──
     if (ctx.mode === 'print') {
-      const t = STILL_TIME;
-      for (const k of ['zh', 'en']) {
-        const fr = frameOf(B, { seed, face: k, edge: edge[k], t, m: 1, tide: tideOf(k, t) });
-        face[k].art.innerHTML = svgArt(B, fr, t, { box, inks, plate, id: uid() });
-      }
+      for (const k of ['zh', 'en']) face[k].art.innerHTML = svgArt(B, still(k), STILL_TIME, { box, inks, plate, id: uid() });
       return { destroy: () => clear(face) };
     }
 
@@ -550,9 +1008,9 @@ export default {
     };
 
     if (!animated) {
-      // Still (or reduced motion): both faces met.
-      ctx.loop((t) => {
-        for (const k of ['zh', 'en']) draw(k, t, 1);
+      // Still (or reduced motion): both faces in the pose picked.
+      ctx.loop(() => {
+        for (const k of ['zh', 'en']) canvases[k].draw(still(k), STILL_TIME, inks);
       });
       return { destroy: () => destroyAll(canvases, face) };
     }
@@ -692,13 +1150,15 @@ function inkSet(B, paperLab, partnerCss) {
   const [L1, C1, h1] = lch(peach.lab);
   const [L2, C2, h2] = lch(partner.lab);
   const dh = ((((h2 - h1 + Math.PI) % TAU) + TAU) % TAU) - Math.PI;
+  const rgb = (v) => {
+    const L = L1 + (L2 - L1) * v;
+    const C = (C1 + (C2 - C1) * v) * (1 - (1 - MID_CHROMA) * 4 * v * (1 - v));
+    const h = h1 + dh * v ** HUE_LAG;
+    return B.oklabToRgb([L, C * Math.cos(h), C * Math.sin(h)]);
+  };
   return {
-    colour(v) {
-      const L = L1 + (L2 - L1) * v;
-      const C = (C1 + (C2 - C1) * v) * (1 - (1 - MID_CHROMA) * 4 * v * (1 - v));
-      const h = h1 + dh * v ** HUE_LAG;
-      return B.rgbHex(B.oklabToRgb([L, C * Math.cos(h), C * Math.sin(h)]));
-    },
+    rgb,
+    colour: (v) => B.rgbHex(rgb(v)),
     plates: {
       peach: (v) => B.rgbHex(grey(1 - peach.density * (1 - v))),
       [PARTNER]: (v) => B.rgbHex(grey(1 - partner.density * v)),
@@ -710,8 +1170,12 @@ function inkSet(B, paperLab, partnerCss) {
 
 /**
  * Draws a frame's two blobs over `box` and fills its host: one outline
- * (with the melt), peach into lavender across the waist (see paintOf and
- * inkSet), then a little sand.
+ * (with the melt and the fill), painted three ways. Apart, each blob
+ * glows toward the other (a radial gradient each, see GLOW); melted, the
+ * lavender's cap melts into the peach (a two-circle radial gradient, see
+ * paintOf and inkSet);
+ * in between (touching, melting) the one hands over to the other on a
+ * coarse colour grid (see mixGrid). Then a little sand.
  * Sized from the host's layout box, so the card's turn and lean never resize it.
  */
 function canvasArt(B, host, box, { grain, cell }) {
@@ -721,11 +1185,14 @@ function canvasArt(B, host, box, { grain, cell }) {
   host.appendChild(canvas);
   const g = canvas.getContext('2d');
   const grid = B.makeGrid(box, cell);
+  const mix = mixGrid(B, box);
   let w = 0;
   let h = 0;
   let dpr = 1;
   let pattern = null;
   let last = null;
+  /** The glow's centre the last time the two were apart: the melt hands over from it. */
+  let lastGlow = null;
 
   const fit = () => {
     const cw = host.offsetWidth;
@@ -741,6 +1208,17 @@ function canvasArt(B, host, box, { grain, cell }) {
     return true;
   };
 
+  const pathOf = (loops) => {
+    const p = new Path2D();
+    smoothLoops(
+      loops,
+      (x, y) => p.moveTo(x, y),
+      (cx, cy, x, y) => p.quadraticCurveTo(cx, cy, x, y),
+      () => p.closePath(),
+    );
+    return p;
+  };
+
   const paint = () => {
     if (!last || !fit()) return;
     const [fr, t, inks] = last;
@@ -754,20 +1232,38 @@ function canvasArt(B, host, box, { grain, cell }) {
     const sx = canvas.width / box.w;
     const sy = canvas.height / box.h;
     g.setTransform(sx, 0, 0, sy, -box.x * sx, -box.y * sy);
-    const outline = new Path2D();
-    smoothLoops(
-      loops,
-      (x, y) => outline.moveTo(x, y),
-      (cx, cy, x, y) => outline.quadraticCurveTo(cx, cy, x, y),
-      () => outline.closePath(),
-    );
     g.save();
-    g.clip(outline, 'evenodd');
-    const { x1, y1, x2, y2, stops } = fr.paint;
-    const grad = g.createLinearGradient(x1, y1, x2, y2);
-    for (const [s, v] of stops) grad.addColorStop(s, inks.colour(v));
-    g.fillStyle = grad;
-    g.fillRect(box.x, box.y, box.w, box.h);
+    g.clip(pathOf(loops), 'evenodd');
+    const glow = glowOf(fr, loops);
+    if (glow) {
+      lastGlow = glow;
+      // The gradient is a circle round the origin, drawn through the glow's ellipse; the outline is
+      // taken back through the inverse, so it lands where it is.
+      const [ma, mb, mc, md, me, mf] = glowMatrix(glow);
+      const to = new DOMMatrix([ma, mb, mc, md, me, mf]);
+      const back = to.inverse();
+      for (const own of [0, 1]) {
+        const mine = loops.filter((_, i) => glow.sideOf[i] === own);
+        if (!mine.length) continue;
+        const grad = g.createRadialGradient(0, 0, 0, 0, 0, GLOW_REACH);
+        for (const [u, v] of glowStops(own === 1)) grad.addColorStop(u, inks.colour(v));
+        const shape = new Path2D();
+        shape.addPath(pathOf(mine), back);
+        g.save();
+        g.transform(ma, mb, mc, md, me, mf);
+        g.fillStyle = grad;
+        g.fill(shape, 'evenodd');
+        g.restore();
+      }
+    } else if (fr.melt < 1 && lastGlow) {
+      mix.paint(g, fr, t, inks, lastGlow);
+    } else {
+      const { focal: F, end: E, stops } = fr.paint;
+      const grad = g.createRadialGradient(F.x, F.y, F.r, E.x, E.y, E.r);
+      for (const [s, v] of stops) grad.addColorStop(s, inks.colour(v));
+      g.fillStyle = grad;
+      g.fillRect(box.x, box.y, box.w, box.h);
+    }
     if (grain > 0) {
       // One grain per CSS pixel, unsmoothed: sharp specks, not blotches (the hero's recipe).
       pattern = pattern || g.createPattern(grainTile(B), 'repeat');
@@ -794,6 +1290,64 @@ function canvasArt(B, host, box, { grain, cell }) {
     destroy() {
       ro.disconnect();
       canvas.remove();
+    },
+  };
+}
+
+/** The colour grid's cell (0.1 mm): 1 mm, drawn smoothed, under the outline. */
+const MIX_CELL = 10;
+
+/**
+ * The paint while the two touch and melt, on a coarse grid: the glow (each
+ * point on the side of the blob whose own field is the stronger, smoothly
+ * across the neck) handed over to the melt's hand-over as the melt comes in.
+ */
+function mixGrid(B, box) {
+  let gr = null;
+  let cv = null;
+  let cx = null;
+  let img = null;
+  return {
+    paint(g, fr, t, inks, glow) {
+      if (!gr) {
+        gr = B.makeGrid(box, MIX_CELL);
+        cv = document.createElement('canvas');
+        cv.width = gr.nx;
+        cv.height = gr.ny;
+        cx = cv.getContext('2d');
+        img = cx.createImageData(gr.nx, gr.ny);
+      }
+      const LW = lobeList(B, [fr.W], t);
+      const LO = lobeList(B, [fr.O], t);
+      const mu = fr.melt;
+      const d = img.data;
+      for (let j = 0; j < gr.ny; j++) {
+        const y = gr.y0 + j * MIX_CELL;
+        for (let i = 0; i < gr.nx; i++) {
+          const x = gr.x0 + i * MIX_CELL;
+          const fW = fieldOf(LW, x, y);
+          const fO = fieldOf(LO, x, y);
+          const side =
+            fW + fO > 0.02
+              ? B.smoothstep(0.5 + (2 * (fO - fW)) / (fW + fO))
+              : Math.hypot(x - fr.O.x, y - fr.O.y) / fr.O.R < Math.hypot(x - fr.W.x, y - fr.W.y) / fr.W.R
+                ? 1
+                : 0;
+          const tg = glowAt(glow, x, y);
+          const vg = side + (1 - 2 * side) * tg;
+          const v = vg + (shareAt(fr.paint, x, y) - vg) * mu;
+          const [r, gg, b] = inks.rgb(v);
+          const o = (j * gr.nx + i) * 4;
+          d[o] = r;
+          d[o + 1] = gg;
+          d[o + 2] = b;
+          d[o + 3] = 255;
+        }
+      }
+      cx.putImageData(img, 0, 0);
+      g.imageSmoothingEnabled = true;
+      g.imageSmoothingQuality = 'high';
+      g.drawImage(cv, gr.x0 - MIX_CELL / 2, gr.y0 - MIX_CELL / 2, gr.nx * MIX_CELL, gr.ny * MIX_CELL);
     },
   };
 }
@@ -832,14 +1386,12 @@ function smoothLoops(loops, moveTo, quadTo, close) {
 
 // ── print: vector ───────────────────────────────────────────────────────
 
-/** A frame's outline (with the melt) as SVG path data, traced on a `cell` grid over `box`. */
-function outlineOf(B, fr, t, box, cell = 3) {
-  const g = B.makeGrid(box, cell);
-  sampleFrame(B, fr, t, g);
+/** Traced loops as SVG path data (the hero's smoothing). */
+function loopsPath(loops) {
   const f = (n) => Math.round(n * 10) / 10;
   let d = '';
   smoothLoops(
-    B.traceContours(g),
+    loops,
     (x, y) => (d += `M${f(x)} ${f(y)}`),
     (cx, cy, x, y) => (d += `Q${f(cx)} ${f(cy)} ${f(x)} ${f(y)}`),
     () => (d += 'Z'),
@@ -847,29 +1399,58 @@ function outlineOf(B, fr, t, box, cell = 3) {
   return d;
 }
 
+/** A frame's traced loops (with the melt and the fill), on a `cell` grid over `box`. */
+function loopsOf(B, fr, t, box, cell = 3) {
+  const g = B.makeGrid(box, cell);
+  sampleFrame(B, fr, t, g);
+  return B.traceContours(g);
+}
+
+/** A frame's outline (with the melt and the fill) as SVG path data, traced on a `cell` grid over `box`. */
+function outlineOf(B, fr, t, box, cell = 3) {
+  return loopsPath(loopsOf(B, fr, t, box, cell));
+}
+
 /**
- * The frame as SVG: one vector outline filled with the hand-over (an opaque
- * gradient, so the PDF keeps it vector; nothing else, the paper is the
- * stock). With `plate`, that ink's density as grey on white instead: the
- * separation a spot plate (or a riso master) is made from.
+ * The frame as SVG: vector outlines filled with opaque gradients, so the
+ * PDF keeps them vector (nothing else: the paper is the stock). Met, one
+ * outline and the hand-over; apart, each blob its own outline and its glow
+ * toward the other (a radial gradient each). With `plate`, that ink's
+ * density as grey on white instead: the separation a spot plate (or a riso
+ * master) is made from.
  */
 function svgArt(B, fr, t, { box, inks, plate, id }) {
-  const d = outlineOf(B, fr, t, box, 3);
+  const loops = loopsOf(B, fr, t, box, 3);
   const vb = `${box.x} ${box.y} ${box.w} ${box.h}`;
   const open = `<svg class="fct-svg" viewBox="${vb}" preserveAspectRatio="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">`;
-  const { x1, y1, x2, y2, stops } = fr.paint;
   const f = (n) => n.toFixed(1);
-  const grad = (colour) =>
-    `<defs><linearGradient id="${id}" gradientUnits="userSpaceOnUse" x1="${f(x1)}" y1="${f(y1)}" x2="${f(x2)}" y2="${f(y2)}">` +
-    stops.map(([s, v]) => `<stop offset="${s.toFixed(4)}" stop-color="${colour(v)}"/>`).join('') +
-    `</linearGradient></defs>`;
-  if (plate) {
-    const white = `<rect x="${box.x}" y="${box.y}" width="${box.w}" height="${box.h}" fill="#fff"/>`;
-    const density = inks.plates[plate];
-    if (!density) return open + white + '</svg>';
-    return open + grad(density) + white + `<path data-ink="spot-${plate}" d="${d}" fill="url(#${id})" fill-rule="evenodd"/></svg>`;
+  const stopsOf = (stops, colour) => stops.map(([s, v]) => `<stop offset="${s.toFixed(4)}" stop-color="${colour(v)}"/>`).join('');
+  const white = plate ? `<rect x="${box.x}" y="${box.y}" width="${box.w}" height="${box.h}" fill="#fff"/>` : '';
+  const colour = plate ? inks.plates[plate] : inks.colour;
+  if (plate && !colour) return open + white + '</svg>';
+  const ink = plate ? `spot-${plate}` : 'peach-lavender';
+  const glow = glowOf(fr, loops);
+  if (glow) {
+    let defs = '';
+    let body = '';
+    for (const own of [0, 1]) {
+      const mine = loops.filter((_, i) => glow.sideOf[i] === own);
+      if (!mine.length) continue;
+      defs +=
+        `<radialGradient id="${id}${own}" gradientUnits="userSpaceOnUse" cx="0" cy="0" r="${GLOW_REACH}" gradientTransform="matrix(${glowMatrix(glow).map((n) => +n.toFixed(4)).join(' ')})">` +
+        stopsOf(glowStops(own === 1), colour) +
+        `</radialGradient>`;
+      body += `<path data-ink="${ink}" d="${loopsPath(mine)}" fill="url(#${id}${own})" fill-rule="evenodd"/>`;
+    }
+    return open + `<defs>${defs}</defs>` + white + body + '</svg>';
   }
-  return open + grad(inks.colour) + `<path data-ink="peach-lavender" d="${d}" fill="url(#${id})" fill-rule="evenodd"/></svg>`;
+  // The hand-over as one two-circle radial gradient (see paintOf), the same one the canvas draws.
+  const { focal: F, end: E, stops } = fr.paint;
+  const grad =
+    `<defs><radialGradient id="${id}" gradientUnits="userSpaceOnUse" fx="${f(F.x)}" fy="${f(F.y)}" fr="${f(F.r)}" cx="${f(E.x)}" cy="${f(E.y)}" r="${f(E.r)}">` +
+    stopsOf(stops, colour) +
+    `</radialGradient></defs>`;
+  return open + grad + white + `<path data-ink="${ink}" d="${loopsPath(loops)}" fill="url(#${id})" fill-rule="evenodd"/></svg>`;
 }
 
 // ── the faces ───────────────────────────────────────────────────────────

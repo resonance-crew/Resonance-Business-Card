@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<!-- Made from card.html by tools/short-pages.mjs: edit card.html, then run it again. -->
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="card-person" content="hsiao">
+<link rel="canonical" href="https://hi.resonance.channel/liball">
+<meta property="og:type" content="profile">
+<meta property="og:title" content="蕭力文 Li-Wen Hsiao｜共振 Resonance">
+<meta property="og:description" content="讓生命影響生命 · Let lives influence lives">
+<meta property="og:url" content="https://hi.resonance.channel/liball">
+<meta property="og:image" content="https://hi.resonance.channel/print/facets/hsiao-front.png">
+<meta name="twitter:card" content="summary_large_image">
+<title>蕭力文 Li-Wen Hsiao｜共振 Resonance</title>
+<meta name="description" content="讓生命影響生命 · Let lives influence lives">
+<meta name="theme-color" content="#efe7dc" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#1a1511" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,800;1,400;1,600&display=swap">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/organic.css">
+<!-- Fetch the module graph and the card's direction at once, not one import after another. -->
+<link rel="modulepreload" href="js/share.js">
+<link rel="modulepreload" href="js/organic.js">
+<link rel="modulepreload" href="js/card3d.js">
+<link rel="modulepreload" href="js/ctx.js">
+<link rel="modulepreload" href="js/people.js">
+<link rel="modulepreload" href="js/blobs.js">
+<link rel="modulepreload" href="js/qr.js">
+<link rel="modulepreload" href="directions/facets.js">
+<link rel="preload" as="style" href="directions/facets.css">
+<style>
+  /* One card on a desk; what you can do with it underneath. */
+  html, body { min-height: 100%; }
+  body {
+    background:
+      radial-gradient(110% 70% at 50% 28%, var(--page) 0%, var(--page-deep) 100%) fixed;
+  }
+  .share {
+    min-height: 100dvh;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    padding-inline: max(16px, env(safe-area-inset-left, 0px));
+    padding-block: max(14px, env(safe-area-inset-top, 0px)) max(20px, env(safe-area-inset-bottom, 0px));
+    max-width: 760px;
+    margin: 0 auto;
+  }
+  .share-top { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+  .share-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--ink);
+    text-decoration: none;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 17px;
+    line-height: 1;
+  }
+  /* The mark is a block of its own (an inline one sat on the baseline with the line's descent
+     under it, so centring that box lifted the waves ~2 px) and the line is exactly the type,
+     so the flex centre is the ink centre: measured at 390 and 1280, zh and en, the waves' ink
+     centre lies within 0.5 px of the wordmark's (共振's ink centroid to 0.05 px). */
+  #brand-mark { display: block; flex: none; width: 26px; height: 26px; color: var(--accent); }
+  #brand-mark svg { display: block; width: 100%; height: 100%; }
+  .share-brand:focus-visible { border-radius: 6px; }
+  /* The site's language control: the wobbly globe and the language's own name, frameless. */
+  .lang-toggle {
+    appearance: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border: 0;
+    background: none;
+    border-radius: 10px;
+    padding: 8px 12px;
+    margin-right: -12px;
+    font-family: var(--font-body);
+    font-size: 14px;
+    line-height: 1;
+    color: var(--ink);
+    cursor: pointer;
+  }
+  .lang-toggle .o-globe { width: 17px; height: 17px; flex: none; }
+  .share-main {
+    display: grid;
+    align-content: center;
+    justify-items: center;
+    gap: 18px;
+    padding-block: clamp(20px, 6vh, 64px);
+    min-width: 0;
+  }
+  #stage { width: 100%; display: grid; place-items: center; padding-block: 8px 4px; }
+  #stage .c3-stage { width: min(100%, 560px); }
+  #stage[data-orientation='portrait'] .c3-stage { width: min(78%, 330px, calc((100dvh - 330px) * 0.6)); min-width: 220px; }
+  .share-hint { margin: 0; font-size: 12.5px; letter-spacing: 0.12em; color: var(--ink-soft); }
+  .share-actions { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 6px; }
+  .share-actions .o-btn {
+    padding: 10px 18px;
+    font-family: var(--font-body);
+    font-size: 14.5px;
+    font-weight: 600;
+    line-height: 1.6;
+    letter-spacing: 0.04em;
+  }
+  #about-link .o-label span { display: inline-block; transition: transform 0.2s var(--ease-out); }
+  #about-link:hover .o-label span { transform: translate(2px, -2px); }
+  @media (prefers-reduced-motion: reduce) { #about-link .o-label span { transition: none; } }
+  .share-email { margin: 0; font-size: 14px; color: var(--ink-soft); user-select: all; -webkit-user-select: all; font-variant-numeric: tabular-nums; }
+  .share-status { min-height: 1.4em; margin: 0; font-size: 13px; color: var(--accent-ink); }
+  .share-about {
+    max-width: 60ch;
+    width: 100%;
+    margin-top: clamp(16px, 4vh, 40px);
+    display: grid;
+    gap: 8px;
+  }
+  .share-about .o-divider { margin-bottom: 12px; }
+  /* Before the hand-drawn rule is drawn: a plain one where it will be. */
+  .o-divider:empty { height: 1px; background: currentColor; }
+  /* The footer link is 12 px: the pen's underline at INK_LIGHT, so it doesn't outweigh the letters. */
+  .share-foot .o-link-line path { stroke-width: 1.2px; }
+  .share-about h2 { margin: 0; font-family: var(--font-sans-zh); font-size: 15px; letter-spacing: 0.14em; font-weight: 600; color: var(--ink-soft); }
+  .share-about p { margin: 0; font-family: var(--font-serif-zh); font-size: 15.5px; line-height: 1.95; letter-spacing: 0.03em; text-wrap: pretty; }
+  html[lang='en'] .share-about p { font-family: var(--font-display); letter-spacing: 0; line-height: 1.7; }
+  .share-foot { text-align: center; font-size: 12px; color: var(--ink-soft); letter-spacing: 0.08em; }
+  .share-foot .o-link { color: var(--ink-soft); }
+</style>
+</head>
+<body>
+<div class="share">
+  <header class="share-top">
+    <a class="share-brand" href="https://resonance.channel" target="_blank" rel="noopener"><span id="brand-mark" aria-hidden="true"></span><span class="share-wordmark">共振 Resonance</span></a>
+    <button type="button" class="lang-toggle o-bare" id="lang"><span class="lang-label">English</span></button>
+  </header>
+  <main class="share-main">
+    <div id="stage"></div>
+    <p class="share-hint" id="hint">點一下翻面</p>
+    <div class="share-actions">
+      <button type="button" id="save" class="o-btn" data-variant="solid" data-shape-pending><span class="o-label">存到聯絡人</span></button>
+      <button type="button" id="copy" class="o-btn" data-variant="tonal" data-shape-pending><span class="o-label">複製 Email</span></button>
+      <a id="about-link" class="o-btn" data-variant="tonal" data-shape-pending href="https://resonance.channel/zh-TW/about" target="_blank" rel="noopener"><span class="o-label">認識共振 <span aria-hidden="true">↗</span></span></a>
+    </div>
+    <p class="share-email" id="email"></p>
+    <p class="share-status" id="status" role="status" aria-live="polite"></p>
+    <section class="share-about" aria-labelledby="about-title">
+      <div class="o-divider" id="about-rule"></div>
+      <h2 id="about-title">關於共振</h2>
+      <p id="mission"></p>
+    </section>
+  </main>
+  <footer class="share-foot"><a id="foot-link" class="o-link" href="https://resonance.channel" target="_blank" rel="noopener">resonance.channel</a></footer>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/motion@12.38.0/dist/motion.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcode-generator@2.0.4/dist/qrcode.js"></script>
+<script type="module" src="js/share.js"></script>
+</body>
+</html>

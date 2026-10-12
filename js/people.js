@@ -10,6 +10,8 @@
 export const PEOPLE = [
   {
     id: 'chen',
+    /** Their own short address: <CARD_BASE>ncc */
+    short: 'ncc',
     zh: '陳念誠',
     en: 'Nian-Cheng Chen',
     // How the English name breaks on a card that sets given name and family name apart.
@@ -21,6 +23,7 @@ export const PEOPLE = [
   },
   {
     id: 'hsiao',
+    short: 'liball',
     zh: '蕭力文',
     en: 'Li-Wen Hsiao',
     given: 'Li-Wen',
@@ -31,6 +34,7 @@ export const PEOPLE = [
   },
   {
     id: 'fang',
+    short: 'nunu',
     zh: '方昱晴',
     en: 'Yu-Ching Fang',
     given: 'Yu-Ching',
@@ -41,6 +45,7 @@ export const PEOPLE = [
   },
   {
     id: 'cheng',
+    short: 'ted',
     zh: '鄭義信',
     en: 'Yi-Hsin Cheng',
     given: 'Yi-Hsin',
@@ -52,14 +57,16 @@ export const PEOPLE = [
 ];
 
 /**
- * Where the digital cards live (GitHub Pages). The QR code on each printed
- * card opens that person's own digital card, where the contact can be saved.
+ * Where the digital cards live. The QR code on each printed card opens that
+ * person's own digital card, where the contact can be saved. Each person has
+ * a short page at <CARD_BASE><short> (ncc.html etc., made from card.html by
+ * tools/short-pages.mjs; GitHub Pages serves /ncc as ncc.html).
  */
-export const CARD_BASE = 'https://resonance-crew.github.io/Resonance-Business-Card/';
+export const CARD_BASE = 'https://hi.resonance.channel/';
 
-/** One person's digital card: card.html#<id>. */
+/** One person's digital card: <CARD_BASE><short>. */
 export function cardUrl(person) {
-  return `${CARD_BASE}card.html#${person.id}`;
+  return `${CARD_BASE}${person.short}`;
 }
 
 /** The site's own words, in both languages, exactly as resonance.channel prints them. */

@@ -10,6 +10,7 @@
  *     orientation: 'landscape' | 'portrait',
  *     edgeColor?, edgePaint?: { l, r, t, b }, turnDir?: ±1, radiusMm?, thicknessMm?,
  *     proofSpread?: true,     // the proof also lays the faces side by side, trim to trim
+ *     poses?: [{ id, label }], // the frames still and print can show (the first is the default); ctx.pose
  *     pitch: '一句話說它是什麼',
  *     notes: [{ k: '概念', v: '…' }, …],
  *     langs: [{ id: 'both', label: '中英並列' }, …]   // the first is the default
@@ -57,6 +58,7 @@ const state = {
   d: pick(params.get('d') ?? (DIRECTIONS.includes(hash) ? hash : store.get('d')), DIRECTIONS, DEFAULT_DIRECTION),
   p: pick(params.get('p') ?? (PEOPLE.some((x) => x.id === hash) ? hash : store.get('p')), PEOPLE.map((x) => x.id), PEOPLE[0].id),
   lang: params.get('lang'),
+  pose: params.get('pose'),
   grain: params.has('grain') ? params.get('grain') !== '0' : store.get('grain') !== '0',
   motion: params.get('motion') === 'still' ? 'still' : 'live',
   view: params.get('view') ?? 'page',
@@ -69,7 +71,7 @@ function pick(v, list, fallback) {
 
 const load = loadDirection;
 /** The ctx options the page's state gives. */
-const ctxOpts = (extra = {}) => ({ personId: state.p, lang: state.lang, grain: state.grain, ...extra });
+const ctxOpts = (extra = {}) => ({ personId: state.p, lang: state.lang, grain: state.grain, pose: state.pose, ...extra });
 
 // ── the page ────────────────────────────────────────────────────────────
 
@@ -136,6 +138,15 @@ async function render() {
     state.lang = id;
     render();
   });
+  const poseRow = $('#pose-row');
+  if (poseRow) {
+    poseRow.hidden = !dir.poses?.length;
+    if (dir.poses?.length)
+      renderChips('#poses', dir.poses, ctx.pose, (id) => {
+        state.pose = id;
+        render();
+      });
+  }
   renderChips(
     '#motion',
     [
@@ -195,7 +206,10 @@ function renderSpread(dir, trim, mmPx) {
   fig.style.margin = '0';
   const row = document.createElement('div');
   row.className = 'spread';
-  row.style.setProperty('--mm-px', `${mmPx}px`);
+  // Both faces and the 4 mm padding must fit the width (on a phone the flex row would squash them).
+  const avail = $('#proof-sheets').getBoundingClientRect().width || 600;
+  const px = Math.min(mmPx, avail / (2 * trim[0] + 8));
+  row.style.setProperty('--mm-px', `${px}px`);
   row.style.setProperty('--trim-w', trim[0]);
   row.style.setProperty('--trim-h', trim[1]);
   const faces = {};
@@ -324,6 +338,7 @@ async function init() {
       b.addEventListener('click', () => {
         state.d = id;
         state.lang = null;
+        state.pose = null;
         store.set('d', id);
         render();
       });
