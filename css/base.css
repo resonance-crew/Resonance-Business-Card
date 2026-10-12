@@ -1,0 +1,423 @@
+/* Layout: a desk with one card on it. The card is the stage (left, or on top on a phone);
+   the choices and the notes sit beside it; the print proof runs underneath, at true proportions. */
+:root {
+  /* The desk around the card follows the viewer's theme. */
+  --page: oklch(93.6% 0.016 75);
+  --page-deep: oklch(90.5% 0.02 72);
+  --ink: oklch(26% 0.03 60);
+  --ink-soft: oklch(45% 0.04 70);
+  --rule: oklch(83% 0.024 72);
+  --accent: oklch(54.5% 0.125 45);
+  --accent-on: oklch(97.5% 0.01 80);
+  --accent-tint: oklch(88.5% 0.055 58);
+  --accent-ink: oklch(48% 0.11 45);
+  --chip: oklch(96.5% 0.012 75);
+  --shadow: oklch(38% 0.06 48 / 0.34);
+  --focus: oklch(62% 0.14 45);
+
+  /* The card itself is paper: the same in both themes, as a real card on a lit or a dark desk. */
+  --card-paper: oklch(97.5% 0.01 80);
+  --card-ink: oklch(26% 0.03 60);
+  --card-muted: oklch(47% 0.04 70);
+  --card-accent: oklch(54.5% 0.125 45);
+  --edge: oklch(91% 0.02 75);
+
+  --font-display: 'Playfair Display', 'Noto Serif TC', Georgia, serif;
+  --font-body: 'DM Sans', 'Noto Sans TC', system-ui, sans-serif;
+  --font-serif-zh: 'Noto Serif TC', 'Playfair Display', serif;
+  --font-sans-zh: 'Noto Sans TC', 'DM Sans', system-ui, sans-serif;
+
+  --gutter: clamp(16px, 4vw, 48px);
+  --ease-out: cubic-bezier(0.22, 0.8, 0.25, 1);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --page: oklch(21.5% 0.014 60);
+    --page-deep: oklch(18.5% 0.012 60);
+    --ink: oklch(93% 0.012 75);
+    --ink-soft: oklch(75% 0.02 70);
+    --rule: oklch(35% 0.02 60);
+    --accent: oklch(72% 0.12 50);
+    --accent-on: oklch(20% 0.03 50);
+    --accent-tint: oklch(33% 0.045 50);
+    --accent-ink: oklch(80% 0.09 55);
+    --chip: oklch(26% 0.016 60);
+    --shadow: oklch(5% 0.02 50 / 0.75);
+    --focus: oklch(76% 0.12 55);
+    color-scheme: dark;
+  }
+}
+:root[data-theme='dark'] {
+  --page: oklch(21.5% 0.014 60);
+  --page-deep: oklch(18.5% 0.012 60);
+  --ink: oklch(93% 0.012 75);
+  --ink-soft: oklch(75% 0.02 70);
+  --rule: oklch(35% 0.02 60);
+  --accent: oklch(72% 0.12 50);
+  --accent-on: oklch(20% 0.03 50);
+  --accent-tint: oklch(33% 0.045 50);
+  --accent-ink: oklch(80% 0.09 55);
+  --chip: oklch(26% 0.016 60);
+  --shadow: oklch(5% 0.02 50 / 0.75);
+  --focus: oklch(76% 0.12 55);
+  color-scheme: dark;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--page);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }
+button { font: inherit; color: inherit; }
+
+/* ── page frame ─────────────────────────────────────────── */
+.page {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding-inline: var(--gutter);
+  padding-block: clamp(20px, 3vw, 36px) 72px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: clamp(28px, 4vw, 48px);
+}
+.masthead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+.brand svg { width: 34px; height: 34px; color: var(--accent); flex: none; transform: translateY(6%); }
+.brand-name {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1;
+}
+.brand-name small {
+  font-family: var(--font-sans-zh);
+  font-weight: 500;
+  font-size: 13px;
+  letter-spacing: 0.14em;
+  color: var(--ink-soft);
+  margin-left: 10px;
+}
+.meta { font-size: 13px; color: var(--ink-soft); letter-spacing: 0.04em; }
+
+/* ── directions (A / B / C) ─────────────────────────────── */
+.directions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.direction-tab {
+  appearance: none;
+  border: 1px solid var(--rule);
+  background: transparent;
+  border-radius: 999px;
+  padding: 7px 16px 7px 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: background 0.25s var(--ease-out), border-color 0.25s var(--ease-out), transform 0.2s var(--ease-out);
+}
+.direction-tab:hover { border-color: var(--ink-soft); }
+.direction-tab:active { transform: scale(0.98); }
+.direction-tab .letter {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 14px;
+  background: var(--chip);
+}
+.direction-tab .label { display: grid; line-height: 1.15; text-align: left; }
+.direction-tab .label b { font-family: var(--font-sans-zh); font-weight: 600; font-size: 14px; letter-spacing: 0.06em; }
+.direction-tab .label span { font-size: 11.5px; color: var(--ink-soft); letter-spacing: 0.02em; }
+.direction-tab .rank {
+  font-style: normal;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  margin-left: 6px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: var(--accent-tint);
+  color: var(--accent-ink);
+  vertical-align: 1px;
+}
+.direction-tab[aria-pressed='true'] .rank { background: color-mix(in oklch, var(--accent-on) 24%, transparent); color: var(--accent-on); }
+.direction-tab[aria-pressed='true'] {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-on);
+}
+.direction-tab[aria-pressed='true'] .letter { background: color-mix(in oklch, var(--accent-on) 22%, transparent); }
+.direction-tab[aria-pressed='true'] .label span { color: color-mix(in oklch, var(--accent-on) 78%, transparent); }
+
+/* ── stage + side panel ─────────────────────────────────── */
+.workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: clamp(24px, 4vw, 56px);
+  align-items: start;
+}
+.workspace > * { min-width: 0; }
+@media (min-width: 980px) {
+  .workspace { grid-template-columns: minmax(0, 1.55fr) minmax(300px, 1fr); }
+  /* The card stays in view while the notes beside it are read. */
+  .workspace > :first-child { position: sticky; top: 20px; }
+}
+.stage-wrap {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: clamp(300px, 46vw, 560px);
+  padding: clamp(28px, 4vw, 56px) clamp(14px, 4vw, 48px);
+  border-radius: 28px;
+  background:
+    radial-gradient(120% 90% at 50% 40%, color-mix(in oklch, var(--page) 60%, white 0%) 0%, var(--page-deep) 100%);
+}
+#stage { width: 100%; display: grid; place-items: center; }
+.stage-hint {
+  margin-top: 20px;
+  font-size: 12.5px;
+  color: var(--ink-soft);
+  letter-spacing: 0.06em;
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.stage-hint kbd {
+  font-family: var(--font-body);
+  font-size: 11px;
+  border: 1px solid var(--rule);
+  border-bottom-width: 2px;
+  border-radius: 5px;
+  padding: 0 5px;
+}
+.flip-button {
+  appearance: none;
+  border: 0;
+  border-radius: 999px;
+  padding: 8px 16px;
+  background: var(--accent-tint);
+  color: var(--accent-ink);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: transform 0.2s var(--ease-out);
+}
+.flip-button:active { transform: scale(0.97); }
+
+.panel { display: grid; gap: 22px; min-width: 0; }
+.panel h2 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(26px, 3vw, 34px);
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+}
+.panel h2 .zh { font-family: var(--font-serif-zh); font-weight: 600; letter-spacing: 0.08em; margin-right: 0.35em; font-size: 0.9em; }
+.pitch { margin: 0; color: var(--ink-soft); font-size: 15.5px; text-wrap: pretty; }
+.control { display: grid; gap: 8px; }
+.control-label { font-size: 11.5px; letter-spacing: 0.16em; color: var(--ink-soft); font-weight: 600; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip {
+  appearance: none;
+  border: 1px solid var(--rule);
+  background: var(--chip);
+  border-radius: 999px;
+  padding: 5px 13px;
+  font-size: 13.5px;
+  cursor: pointer;
+  transition: background 0.2s var(--ease-out), border-color 0.2s var(--ease-out);
+}
+.chip:hover { border-color: var(--ink-soft); }
+.chip[aria-pressed='true'] { background: var(--ink); color: var(--page); border-color: var(--ink); }
+.notes { display: grid; gap: 14px; margin: 0; padding: 18px 0 0; border-top: 1px solid var(--rule); }
+.notes div { display: grid; grid-template-columns: 4.6em minmax(0, 1fr); gap: 12px; }
+.notes dt { font-size: 12px; font-weight: 600; letter-spacing: 0.12em; color: var(--accent-ink); padding-top: 2px; }
+.notes dd { margin: 0; font-size: 14px; color: var(--ink); text-wrap: pretty; }
+
+/* ── print proof ────────────────────────────────────────── */
+.proof { display: grid; gap: 18px; }
+.proof-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.proof-head h3 { margin: 0; font-family: var(--font-sans-zh); font-size: 17px; letter-spacing: 0.1em; font-weight: 600; }
+.proof-head p { margin: 0; font-size: 13px; color: var(--ink-soft); }
+.proof-sheets { display: flex; gap: clamp(20px, 3vw, 40px); flex-wrap: wrap; justify-content: center; }
+.sheet { display: grid; gap: 10px; justify-items: center; min-width: 0; }
+.sheet-label { font-size: 12px; letter-spacing: 0.14em; color: var(--ink-soft); }
+.sheet--spread { flex-basis: 100%; }
+.spread {
+  display: flex;
+  padding: calc(var(--mm-px) * 4);
+  background: oklch(99% 0.004 80);
+  box-shadow: 0 1px 2px oklch(40% 0.03 60 / 0.12), 0 8px 28px -12px oklch(40% 0.05 50 / 0.25);
+  max-width: 100%;
+  overflow: hidden;
+}
+.spread .flat-card { overflow: hidden; background: var(--card-paper); }
+.spread .flat-card + .flat-card { box-shadow: -0.5px 0 0 oklch(60% 0.12 25 / 0.45); }
+.spread .face { position: absolute; inset: 0; }
+
+/* A flat face with its bleed and crop marks (the shell builds these). */
+.flat {
+  --pad: calc(var(--mm-px) * 6);
+  position: relative;
+  padding: var(--pad);
+  background: oklch(99% 0.004 80);
+  box-shadow: 0 1px 2px oklch(40% 0.03 60 / 0.12), 0 8px 28px -12px oklch(40% 0.05 50 / 0.25);
+  max-width: 100%;
+}
+.flat-card {
+  position: relative;
+  width: calc(var(--trim-w) * var(--mm-px));
+  height: calc(var(--trim-h) * var(--mm-px));
+  container-type: inline-size;
+}
+/* The proof shows the card on its paper, bleed included (the veil washes the bleed out). */
+.flat .flat-card { background: var(--card-paper); box-shadow: 0 0 0 calc(var(--mm-px) * 2) var(--card-paper); }
+.flat-card .face { position: absolute; inset: 0; overflow: visible; }
+.flat-veil {
+  position: absolute;
+  inset: calc(var(--mm-px) * -2);
+  pointer-events: none;
+  /* The bleed: what the cutter takes away, washed out. */
+  box-shadow: inset 0 0 0 calc(var(--mm-px) * 2) oklch(99% 0.004 80 / 0.62);
+  z-index: 3;
+}
+.flat-trim { position: absolute; inset: 0; outline: 0.5px dashed oklch(60% 0.12 25 / 0.5); z-index: 3; pointer-events: none; }
+.crop { position: absolute; background: oklch(25% 0.02 60); z-index: 4; }
+.crop.h { height: 0.6px; width: calc(var(--mm-px) * 3.2); }
+.crop.v { width: 0.6px; height: calc(var(--mm-px) * 3.2); }
+
+/* ── the 3D card ────────────────────────────────────────── */
+.c3-stage {
+  position: relative;
+  perspective: 1400px;
+  perspective-origin: 50% 40%;
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
+  width: min(100%, 600px);
+  display: grid;
+  place-items: center;
+}
+.c3-stage.is-portrait { width: min(100%, 340px); }
+/* A portrait card on a phone would fill the screen; keep it a card you can hold. */
+@media (max-width: 640px) {
+  .c3-stage.is-portrait { width: min(72vw, 280px); }
+}
+.c3-card {
+  position: relative;
+  width: 100%;
+  aspect-ratio: var(--trim-w) / var(--trim-h);
+  transform-style: preserve-3d;
+  will-change: transform;
+  cursor: grab;
+  container-type: inline-size;
+  border-radius: calc(var(--radius-mm) * var(--mm-px, 6px));
+  outline-offset: 10px;
+}
+.c3-card:active { cursor: grabbing; }
+.c3-face {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  border-radius: inherit;
+  background: var(--card-paper);
+  transform: translateZ(calc(var(--t, 4px) / 2));
+}
+.c3-back { transform: rotateY(180deg) translateZ(calc(var(--t, 4px) / 2)); }
+.c3-glare {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  background:
+    radial-gradient(circle at var(--gx, 30%) var(--gy, 20%), oklch(100% 0 0 / 0.55), oklch(100% 0 0 / 0) 46%),
+    linear-gradient(115deg, oklch(100% 0 0 / 0) 30%, oklch(100% 0 0 / 0.16) 48%, oklch(100% 0 0 / 0) 66%);
+  mix-blend-mode: soft-light;
+  opacity: var(--ga, 0);
+  transition: opacity 0.4s var(--ease-out);
+  z-index: 5;
+}
+.c3-back .c3-glare { background-position: 0 0; }
+.c3-edge { position: absolute; background: var(--edge); }
+.c3-edge-l, .c3-edge-r {
+  top: calc(var(--radius-mm) * var(--mm-px, 6px));
+  height: calc(100% - 2 * var(--radius-mm) * var(--mm-px, 6px));
+  width: var(--t, 4px);
+}
+.c3-edge-l { left: calc(var(--t, 4px) / -2); transform: rotateY(-90deg); }
+.c3-edge-r { left: calc(100% - var(--t, 4px) / 2); transform: rotateY(90deg); }
+.c3-edge-t, .c3-edge-b {
+  left: calc(var(--radius-mm) * var(--mm-px, 6px));
+  width: calc(100% - 2 * var(--radius-mm) * var(--mm-px, 6px));
+  height: var(--t, 4px);
+}
+.c3-edge-t { top: calc(var(--t, 4px) / -2); transform: rotateX(90deg); }
+.c3-edge-b { top: calc(100% - var(--t, 4px) / 2); transform: rotateX(-90deg); }
+.c3-shadow {
+  position: absolute;
+  inset: 6% 4% -2%;
+  border-radius: 40%;
+  background: var(--shadow);
+  filter: blur(22px);
+  transform-origin: 50% 50%;
+  pointer-events: none;
+}
+.c3-fade .c3-face:not([aria-hidden='true']) { animation: c3-fade 0.32s var(--ease-out); }
+@keyframes c3-fade { from { opacity: 0; } to { opacity: 1; } }
+
+/* ── faces: the coordinate system every direction draws in ─ */
+.face {
+  /* One millimetre and one point of the printed card, whatever size the card is shown at. */
+  --mm: calc(100cqw / var(--trim-w));
+  --pt: calc(var(--mm) * 0.3528);
+  --bleed: 2;
+  color: var(--card-ink);
+  font-family: var(--font-body);
+  font-size: calc(var(--pt) * 8);
+  line-height: 1.4;
+}
+.face__art {
+  position: absolute;
+  inset: calc(var(--mm) * var(--bleed) * -1);
+  pointer-events: none;
+}
+.face__art > svg, .face__art > canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.face__content { position: absolute; inset: 0; }
+
+/* A face alone on a page: the PDF and the PNG proofs (view=print). */
+.print-only body, body.print-only { background: transparent; }
+.print-root { position: relative; container-type: inline-size; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition-duration: 0.01ms !important; }
+}

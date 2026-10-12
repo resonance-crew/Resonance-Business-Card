@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>共振 Resonance 名片</title>
+<meta name="description" content="共振 Resonance 的數位名片：點一下翻面">
+<meta name="theme-color" content="#efe7dc" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#1a1511" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,800;1,400;1,600&display=swap">
+<link rel="stylesheet" href="css/base.css">
+<style>
+  /* One card on a desk; what you can do with it underneath. */
+  html, body { min-height: 100%; }
+  body {
+    background:
+      radial-gradient(110% 70% at 50% 28%, var(--page) 0%, var(--page-deep) 100%) fixed;
+  }
+  .share {
+    min-height: 100dvh;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    padding-inline: max(16px, env(safe-area-inset-left, 0px));
+    padding-block: max(14px, env(safe-area-inset-top, 0px)) max(20px, env(safe-area-inset-bottom, 0px));
+    max-width: 760px;
+    margin: 0 auto;
+  }
+  .share-top { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+  .share-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--ink);
+    text-decoration: none;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 17px;
+  }
+  .share-brand svg { width: 26px; height: 26px; color: var(--accent); transform: translateY(6%); }
+  .lang-toggle {
+    appearance: none;
+    border: 1px solid var(--rule);
+    background: transparent;
+    border-radius: 999px;
+    padding: 4px 12px;
+    font-size: 13px;
+    cursor: pointer;
+  }
+  .share-main {
+    display: grid;
+    align-content: center;
+    justify-items: center;
+    gap: 18px;
+    padding-block: clamp(20px, 6vh, 64px);
+    min-width: 0;
+  }
+  #stage { width: 100%; display: grid; place-items: center; padding-block: 8px 4px; }
+  #stage .c3-stage { width: min(100%, 560px); }
+  #stage[data-orientation='portrait'] .c3-stage { width: min(78%, 330px, calc((100dvh - 330px) * 0.6)); min-width: 220px; }
+  .share-hint { margin: 0; font-size: 12.5px; letter-spacing: 0.12em; color: var(--ink-soft); }
+  .share-actions { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 6px; }
+  .share-actions button, .share-actions a {
+    appearance: none;
+    border: 0;
+    border-radius: 999px;
+    padding: 10px 18px;
+    font-size: 14.5px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    text-decoration: none;
+    transition: transform 0.18s var(--ease-out), background 0.2s var(--ease-out);
+  }
+  .share-actions button:active, .share-actions a:active { transform: scale(0.97); }
+  #save { background: var(--accent); color: var(--accent-on); }
+  #copy, #about-link { background: var(--accent-tint); color: var(--accent-ink); }
+  #about-link span { display: inline-block; transition: transform 0.2s var(--ease-out); }
+  #about-link:hover span { transform: translate(2px, -2px); }
+  .share-email { margin: 0; font-size: 14px; color: var(--ink-soft); user-select: all; -webkit-user-select: all; font-variant-numeric: tabular-nums; }
+  .share-status { min-height: 1.4em; margin: 0; font-size: 13px; color: var(--accent-ink); }
+  .share-about {
+    max-width: 60ch;
+    margin-top: clamp(16px, 4vh, 40px);
+    padding-top: 20px;
+    border-top: 1px solid var(--rule);
+    display: grid;
+    gap: 8px;
+  }
+  .share-about h2 { margin: 0; font-family: var(--font-sans-zh); font-size: 15px; letter-spacing: 0.14em; font-weight: 600; color: var(--ink-soft); }
+  .share-about p { margin: 0; font-family: var(--font-serif-zh); font-size: 15.5px; line-height: 1.95; letter-spacing: 0.03em; text-wrap: pretty; }
+  html[lang='en'] .share-about p { font-family: var(--font-display); letter-spacing: 0; line-height: 1.7; }
+  .share-foot { text-align: center; font-size: 12px; color: var(--ink-soft); letter-spacing: 0.08em; }
+  .share-foot a { color: inherit; }
+</style>
+</head>
+<body>
+<div class="share">
+  <header class="share-top">
+    <a class="share-brand" href="https://resonance.channel" target="_blank" rel="noopener"><span id="brand-mark" aria-hidden="true"></span>共振 Resonance</a>
+    <button type="button" class="lang-toggle" id="lang">English</button>
+  </header>
+  <main class="share-main">
+    <div id="stage"></div>
+    <p class="share-hint" id="hint">點一下翻面</p>
+    <div class="share-actions">
+      <button type="button" id="save">存到聯絡人</button>
+      <button type="button" id="copy">複製 Email</button>
+      <a id="about-link" href="https://resonance.channel/zh-TW/about" target="_blank" rel="noopener">認識共振 <span aria-hidden="true">↗</span></a>
+    </div>
+    <p class="share-email" id="email"></p>
+    <p class="share-status" id="status" role="status" aria-live="polite"></p>
+    <section class="share-about" aria-labelledby="about-title">
+      <h2 id="about-title">關於共振</h2>
+      <p id="mission"></p>
+    </section>
+  </main>
+  <footer class="share-foot"><a href="https://resonance.channel" target="_blank" rel="noopener">resonance.channel</a></footer>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/motion@12.38.0/dist/motion.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcode-generator@2.0.4/dist/qrcode.js"></script>
+<script type="module" src="js/share.js"></script>
+</body>
+</html>

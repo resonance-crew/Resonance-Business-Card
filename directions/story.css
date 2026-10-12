@@ -1,0 +1,158 @@
+/* Direction C · 故事卡 / Story Card. Every size is print size: --mm and --pt come from the face.
+   Every rule hangs off the direction's own root (.sc), so the card draws the same on any page,
+   whatever the page's <html> says. Shapes carry their fill and stroke on the paths themselves. */
+
+.sc {
+  position: absolute;
+  inset: 0;
+  color: var(--card-ink, oklch(26% 0.03 60));
+  font-family: 'DM Sans', 'Noto Sans TC', system-ui, sans-serif;
+  font-size: calc(var(--pt) * 7);
+  line-height: 1.4;
+  font-kerning: normal;
+  --sc-muted: var(--card-muted, oklch(47% 0.04 70));
+}
+/* For the press, the quiet colour goes darker: small type in a light tint is screened into dots
+   and breaks up on a toner press or cotton; at L 38 % it prints as a near-solid line. */
+.sc[data-mode='print'] { --sc-muted: oklch(38% 0.03 65); }
+
+.sc p,
+.sc h2 { margin: 0; }
+
+/* A column of text beside a cover, placed by the module (in mm). */
+.sc .sc-col {
+  position: absolute;
+  left: calc(var(--mm) * var(--col-x));
+  top: calc(var(--mm) * var(--col-y));
+  width: calc(var(--mm) * var(--col-w));
+  height: calc(var(--mm) * var(--col-h));
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+/* ── front: the title (the person) ──────────────────────── */
+.sc .sc-name {
+  display: grid;
+  gap: calc(var(--mm) * 1.3);
+  font-weight: normal;
+}
+.sc .sc-name-zh {
+  font-family: 'Noto Serif TC', serif;
+  font-weight: 600;
+  font-size: calc(var(--pt) * 9);
+  line-height: 1.15;
+  letter-spacing: 0.22em;
+  /* The tracking after the last glyph is not part of the name. */
+  margin-right: -0.22em;
+}
+.sc .sc-name-en {
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
+  font-size: calc(var(--pt) * 10.5);
+  line-height: 1.15;
+  letter-spacing: 0.005em;
+}
+.sc[data-lang='zh'] .sc-name-zh { font-size: calc(var(--pt) * 12); letter-spacing: 0.24em; margin-right: -0.24em; }
+/* English alone: given name and family name on two lines, the title a step larger. */
+.sc[data-lang='en'] .sc-name-en { font-size: calc(var(--pt) * 12.5); line-height: 1.1; }
+
+/* ── front: the byline ──────────────────────────────────── */
+.sc .sc-by { display: grid; gap: calc(var(--mm) * 0.35); }
+.sc .sc-by-zh {
+  font-family: 'Noto Sans TC', sans-serif;
+  font-weight: 400;
+  font-size: calc(var(--pt) * 7);
+  line-height: 1.3;
+  letter-spacing: 0.16em;
+}
+.sc .sc-by-en {
+  font-size: calc(var(--pt) * 7.5);
+  line-height: 1.3;
+  letter-spacing: 0.01em;
+  color: var(--sc-muted);
+}
+.sc[data-lang='en'] .sc-by-en { color: inherit; font-weight: 500; font-size: calc(var(--pt) * 7.5); }
+
+/* ── back: the line, under the ripple ───────────────────── */
+.sc .sc-line {
+  display: grid;
+  gap: calc(var(--mm) * 0.9);
+  margin-top: calc(var(--mm) * (var(--line-y) + 1.8));
+}
+.sc .sc-line-zh {
+  font-family: 'Noto Serif TC', serif;
+  font-weight: 500;
+  font-size: calc(var(--pt) * 8);
+  line-height: 1.55;
+  letter-spacing: 0.08em;
+}
+/* Set apart by the italic and the step in size, not by a light tint: Playfair's hairlines are
+   about 0.05 mm here, and a screened colour would break them into dots. */
+.sc .sc-line-en {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: calc(var(--pt) * 9);
+  line-height: 1.28;
+  /* Two lines, broken where the Chinese above breaks: "A story is answered / by another story". */
+  text-wrap: balance;
+  max-width: calc(var(--mm) * 31);
+}
+.sc[data-lang='zh'] .sc-line-zh { font-size: calc(var(--pt) * 10); }
+.sc[data-lang='en'] .sc-line-en {
+  font-style: normal;
+  font-weight: 700;
+  font-size: calc(var(--pt) * 10);
+  line-height: 1.25;
+  max-width: none;
+}
+
+.sc .sc-contact {
+  font-size: calc(var(--pt) * 7);
+  line-height: 1.3;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.01em;
+  width: 100%;
+}
+.sc .sc-mail { display: inline-block; white-space: nowrap; }
+/* A longer real address: 6.5 pt first; if that is still too wide it breaks before its @. */
+.sc .sc-contact[data-fit='small'],
+.sc .sc-contact[data-fit='wrap'] { font-size: calc(var(--pt) * 6.5); }
+.sc .sc-contact[data-fit='wrap'] .sc-mail { white-space: normal; }
+.sc .sc-contact[data-fit='wrap'] .sc-mail > span { display: inline-block; }
+
+/* ── back: the cover is the way to answer: the code, and where it goes ── */
+.sc .sc-door {
+  position: absolute;
+  left: calc(var(--mm) * var(--panel-x));
+  top: calc(var(--mm) * var(--col-y));
+  width: calc(var(--mm) * var(--panel-w));
+  height: calc(var(--mm) * var(--col-h));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: calc(var(--mm) * 2.4);
+  text-align: center;
+}
+.sc .sc-qr { width: calc(var(--mm) * 16); line-height: 0; }
+.sc .sc-qr svg { display: block; width: 100%; height: auto; }
+.sc .sc-site {
+  font-size: calc(var(--pt) * 6.5);
+  line-height: 1.3;
+  letter-spacing: 0.02em;
+  color: var(--sc-muted);
+}
+
+/* ── back: the ripple, drawn in from the outline as the back arrives ── */
+.sc .sc-ripple[data-anim] path {
+  stroke-dasharray: 1 1.2;
+  stroke-dashoffset: 1;
+}
+.sc .sc-ripple[data-anim='on'] path {
+  stroke-dashoffset: 0;
+  transition: stroke-dashoffset 1.9s cubic-bezier(0.33, 0.7, 0.25, 1) 0.35s;
+}
+.sc .sc-ripple[data-anim='on'] path:nth-child(2) { transition-delay: 0.6s; }
+.sc .sc-ripple[data-anim='on'] path:nth-child(3) { transition-delay: 0.85s; }

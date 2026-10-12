@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>QR check</title>
+<style>
+  body { font: 14px/1.5 system-ui, sans-serif; margin: 24px; background: #fff; color: #222; }
+  td, th { padding: 2px 10px; text-align: left; }
+  .ok { color: #1a7f37; } .bad { color: #c62828; font-weight: 600; }
+</style>
+</head>
+<body>
+<!-- Decodes the QR code on every exported face (print/<direction>/<person>-<side>.png, 300 dpi)
+     and checks it opens that person's digital card. Open /tools/qr-check.html with the folder served;
+     the result is also left in document.body.dataset.result for scripts. -->
+<table><thead><tr><th>file</th><th>decoded</th><th></th></tr></thead><tbody id="rows"></tbody></table>
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
+<script type="module">
+  import { PEOPLE, cardUrl } from '../js/people.js';
+  const directions = ['facets', 'meet', 'story'];
+  const rows = document.getElementById('rows');
+  const result = { ok: 0, bad: 0, missing: 0 };
+  for (const d of directions) {
+    for (const p of PEOPLE) {
+      const found = [];
+      for (const side of ['front', 'back']) {
+        const src = `../print/${d}/${p.id}-${side}.png`;
+        const img = new Image();
+        img.src = src;
+        try {
+          await img.decode();
+        } catch {
+          continue;
+        }
+        const c = document.createElement('canvas');
+        c.width = img.naturalWidth;
+        c.height = img.naturalHeight;
+        const g = c.getContext('2d', { willReadFrequently: true });
+        g.drawImage(img, 0, 0);
+        const data = g.getImageData(0, 0, c.width, c.height);
+        const code = window.jsQR(data.data, c.width, c.height);
+        if (code) found.push({ side, text: code.data });
+      }
+      const want = cardUrl(p);
+      const tr = document.createElement('tr');
+      const good = found.length > 0 && found.every((f) => f.text === want);
+      if (!found.length) result.missing++;
+      else if (good) result.ok++;
+      else result.bad++;
+      tr.innerHTML = `<td>${d}/${p.id}</td><td>${found.map((f) => `${f.side}: ${f.text}`).join('<br>') || '(no QR found)'}</td><td class="${good ? 'ok' : 'bad'}">${good ? 'ok' : 'expected ' + want}</td>`;
+      rows.appendChild(tr);
+    }
+  }
+  document.body.dataset.result = JSON.stringify(result);
+  document.documentElement.dataset.ready = '1';
+</script>
+</body>
+</html>

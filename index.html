@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>共振名片提案</title>
+<meta name="description" content="共振 Resonance 團隊名片：可翻面的數位名片，與同一套設計的印刷版">
+<link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,800;1,400;1,600&display=swap">
+<link rel="stylesheet" href="css/base.css">
+<style>
+  .control-row { display: flex; gap: 28px; flex-wrap: wrap; }
+  .decisions { display: grid; gap: 16px; padding-top: 28px; border-top: 1px solid var(--rule); }
+  .decisions h3 { margin: 0; font-family: var(--font-sans-zh); font-size: 17px; letter-spacing: 0.1em; font-weight: 600; }
+  .decisions dl { margin: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: 18px 40px; }
+  .decisions dl > div { display: grid; gap: 4px; align-content: start; }
+  .decisions dt { font-size: 13px; font-weight: 600; letter-spacing: 0.12em; color: var(--accent-ink); }
+  .decisions dd { margin: 0; font-size: 14.5px; line-height: 1.75; text-wrap: pretty; }
+  .mission {
+    display: grid;
+    gap: 14px;
+    max-width: 68ch;
+    padding-top: 28px;
+    border-top: 1px solid var(--rule);
+  }
+  .mission h3 { margin: 0; font-family: var(--font-sans-zh); font-size: 17px; letter-spacing: 0.1em; font-weight: 600; }
+  .mission .why { margin: 0; font-size: 13.5px; color: var(--ink-soft); }
+  .mission blockquote {
+    margin: 0;
+    font-family: var(--font-serif-zh);
+    font-size: 16.5px;
+    line-height: 1.95;
+    letter-spacing: 0.04em;
+    text-wrap: pretty;
+  }
+  .mission blockquote strong { color: var(--accent-ink); font-weight: 600; }
+  body.card-only { background: var(--page-deep); }
+  body.card-only .page { min-height: 100vh; place-items: center; padding: 40px 16px; }
+  body.card-only .page > :not(.workspace),
+  body.card-only .panel,
+  body.card-only .stage-hint { display: none; }
+  body.card-only .workspace { width: 100%; grid-template-columns: minmax(0, 1fr); }
+  body.card-only .stage-wrap { background: none; }
+</style>
+</head>
+<body>
+<main class="page">
+  <header class="masthead">
+    <div class="brand">
+      <span id="brand-mark" aria-hidden="true"></span>
+      <span class="brand-name">共振 Resonance<small>名片提案</small></span>
+    </div>
+    <p class="meta">數位名片＋印刷版 ・ 2026 年 10 月</p>
+  </header>
+
+  <nav class="directions" id="directions" aria-label="設計方向"></nav>
+
+  <section class="workspace" aria-label="名片">
+    <div>
+      <div class="stage-wrap"><div id="stage"></div></div>
+      <div class="stage-hint">
+        <button type="button" id="flip" class="flip-button">翻面</button>
+        <span>點卡片、左右拖曳，或按 <kbd>Enter</kbd> 翻面</span>
+      </div>
+    </div>
+    <aside class="panel" aria-label="這個方向">
+      <h2 id="dir-title">共振名片</h2>
+      <p class="pitch" id="dir-pitch"></p>
+      <div class="control"><span class="control-label">成員</span><div class="chips" id="people"></div></div>
+      <div class="control"><span class="control-label">語言</span><div class="chips" id="langs"></div></div>
+      <div class="control-row">
+        <div class="control"><span class="control-label">數位版</span><div class="chips" id="motion"></div></div>
+        <div class="control"><span class="control-label">顆粒感</span><div class="chips" id="grain"></div></div>
+      </div>
+      <dl class="notes" id="notes"></dl>
+    </aside>
+  </section>
+
+  <section class="decisions" aria-labelledby="decisions-title">
+    <h3 id="decisions-title">幾個決定</h3>
+    <dl>
+      <div>
+        <dt>中英文怎麼放</dt>
+        <dd>印刷建議一面中文、一面英文：每一面都能用自己的排法，中文可以直排，拿到的人把看得懂的那面朝上就好。若選「相遇」，就維持中英並列，但只讓名字和團隊名雙語，聯絡資訊只放一次。數位版不必並列，頁面會照對方的語言先顯示那一面。</dd>
+      </div>
+      <div>
+        <dt>中文看起來偏大</dt>
+        <dd>中文字填滿整個字身，英文小寫只有一半高，同樣字級中文會大一號、重一級。所以並排時中文設成英文的 0.88 倍左右（11 pt 對 12.5 pt），字重輕一級，字距加寬。</dd>
+      </div>
+      <div>
+        <dt>顆粒感</dt>
+        <dd>數位版保留一點，可以用上面的「顆粒感」開關比較。印刷不放：螢幕上的沙沙感印出來會像髒點，質感交給紙張（棉紙、美術紙）或印法（Riso 本身就有顆粒）。</dd>
+      </div>
+      <div>
+        <dt>要不要動</dt>
+        <dd>數位版要，但要慢：泡泡用官網首頁的呼吸速度，翻面時才有一個主要的時刻。印刷版取其中最好看的一格，向量輸出。</dd>
+      </div>
+      <div>
+        <dt>使命宣言</dt>
+        <dd>名片只放一句「讓生命影響生命」，整段放在數位名片頁（下方「關於共振」）</dd>
+      </div>
+    </dl>
+  </section>
+
+  <section class="proof" aria-label="靜態版">
+    <div class="proof-head">
+      <h3>靜態版・印刷稿</h3>
+      <p id="proof-spec"></p>
+    </div>
+    <div class="proof-sheets" id="proof-sheets"></div>
+  </section>
+
+  <section class="mission" aria-label="關於共振">
+    <h3>關於共振</h3>
+    <p class="why">印刷版只放一句，整段使命放在數位名片頁裡，對方掃 QR 碼時讀到</p>
+    <blockquote>
+      我們相信故事的力量：每個人生而立體而獨特，都帶著自己珍貴的人生經驗；而故事，是串聯人與人、發揮影響力最好的途徑，這是我們打造「共振」的原因。使用者把一段人生寫成一張故事卡片；讀到觸動自己的故事時，回應不是按讚，而是寫下自己的卡片去「共振」它，<strong>讓生命影響生命</strong>。
+    </blockquote>
+  </section>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/motion@12.38.0/dist/motion.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcode-generator@2.0.4/dist/qrcode.js"></script>
+<script type="module" src="js/app.js"></script>
+</body>
+</html>

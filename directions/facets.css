@@ -1,0 +1,162 @@
+/* Direction B 兩面 / Two Sides. Every size is in printed millimetres (--mm) and points (--pt).
+   Each face comes in two mirror layouts: .fct--edge-r (the peach crosses its right edge: the face is
+   in front) and .fct--edge-l (the peach crosses its left edge: the face is behind). */
+
+.fct .fct-zh,
+.fct .fct-en {
+  position: absolute;
+  inset: 0;
+}
+/* The reset weighs nothing (0,0,1), so each line's own weight below holds. */
+:where(.fct) :is(p, h3) { margin: 0; font-weight: inherit; }
+
+/* ── Chinese face ─────────────────────────────────────────── */
+
+.fct-zh-name,
+.fct-zh-team {
+  position: absolute;
+  writing-mode: vertical-rl;
+  text-orientation: upright;
+  font-family: 'Noto Serif TC', serif;
+  line-height: 1;
+  white-space: nowrap;
+}
+/* 13.5 pt: Chinese fills its em, so this matches the 15 pt Playfair name on the other face by eye;
+   the wider tracking keeps the column as long as it was. */
+.fct-zh-name {
+  top: calc(var(--mm) * 10);
+  font-size: calc(var(--pt) * 13.5);
+  font-weight: 500;
+  letter-spacing: 0.72em;
+  color: var(--card-ink);
+}
+/* The team is read first: always the column to the right of the name. */
+.fct-zh-team {
+  top: calc(var(--mm) * 10.4);
+  font-size: calc(var(--pt) * 7.5);
+  font-weight: 400;
+  letter-spacing: 0.36em;
+  color: var(--card-muted);
+}
+.fct-seal {
+  position: absolute;
+  top: calc(var(--mm) * 35.2);
+  width: calc(var(--mm) * 5.6);
+  height: calc(var(--mm) * 5.6);
+}
+.fct-seal svg,
+.fct-mark svg { display: block; width: 100%; height: 100%; }
+
+/* The e-mail: small, horizontal, at the foot. */
+.fct-foot {
+  position: absolute;
+  bottom: calc(var(--mm) * 6);
+  font-family: 'DM Sans', sans-serif;
+  font-size: calc(var(--pt) * 7);
+  line-height: 1.2;
+  letter-spacing: 0.01em;
+  color: var(--card-ink);
+  white-space: nowrap;
+}
+
+/* Peach on the right: the name hangs from the left margin, the team beside it (the name's column
+   centred on the seal's). */
+.fct--zh.fct--edge-r .fct-zh-name { left: calc(var(--mm) * 6.07); }
+.fct--zh.fct--edge-r .fct-zh-team { left: calc(var(--mm) * 15); }
+.fct--zh.fct--edge-r .fct-seal { left: calc(var(--mm) * 5.65); }
+.fct--zh.fct--edge-r .fct-foot { left: calc(var(--mm) * 6); }
+
+/* Peach on the left: the team on the right margin, the name inside it. */
+.fct--zh.fct--edge-l .fct-zh-team { right: calc(var(--mm) * 6); }
+.fct--zh.fct--edge-l .fct-zh-name { right: calc(var(--mm) * 12.87); }
+.fct--zh.fct--edge-l .fct-seal { right: calc(var(--mm) * 12.45); }
+.fct--zh.fct--edge-l .fct-foot { right: calc(var(--mm) * 6); text-align: right; }
+
+/* ── English face ─────────────────────────────────────────── */
+
+.fct-en-name {
+  position: absolute;
+  top: calc(var(--mm) * 8.6);
+  left: calc(var(--mm) * 6);
+  display: grid;
+  font-family: 'Playfair Display', serif;
+  font-size: calc(var(--pt) * 15);
+  line-height: 1.12;
+  color: var(--card-ink);
+}
+.fct-given { font-style: italic; font-weight: 400; }
+.fct-family { font-weight: 600; letter-spacing: 0.005em; }
+.fct-en-mail {
+  position: absolute;
+  top: calc(var(--mm) * 24.4);
+  left: calc(var(--mm) * 6);
+  font-family: 'DM Sans', sans-serif;
+  font-size: calc(var(--pt) * 7);
+  line-height: 1.2;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+/* The code is 14 mm; on screen its paper margin keeps a quiet zone of two modules where a blob might
+   come near. In print the paper is the stock, so the margin prints nothing (the blob stays clear of it). */
+.fct-qr {
+  position: absolute;
+  bottom: calc(var(--mm) * 4.6);
+  width: calc(var(--mm) * 16.2);
+  padding: calc(var(--mm) * 1.1);
+  background: var(--card-paper);
+}
+.fct-qr svg { display: block; width: 100%; height: auto; }
+
+/* The colophon: the team over the site, the last line on the code's foot. */
+.fct-colophon {
+  position: absolute;
+  bottom: calc(var(--mm) * 5.45);
+  display: grid;
+  gap: calc(var(--mm) * 0.9);
+  font-family: 'DM Sans', sans-serif;
+  font-size: calc(var(--pt) * 7);
+  line-height: 1.2;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  color: var(--card-ink);
+}
+.fct-site { color: var(--card-muted); }
+
+/* The mark: on the name's first line, at the far margin, its waves centred on the italic's x-height. */
+.fct-mark {
+  position: absolute;
+  top: calc(var(--mm) * 10.3);
+  right: calc(var(--mm) * 6);
+  width: calc(var(--mm) * 4.2);
+  height: calc(var(--mm) * 4.2);
+}
+
+/* Peach on the left: the code to the bottom right, the colophon on the left margin. */
+.fct--en.fct--edge-l .fct-qr { right: calc(var(--mm) * 4.6); }
+.fct--en.fct--edge-l .fct-colophon { left: calc(var(--mm) * 6); }
+
+/* Peach on the right: the code to the bottom left, the colophon beside it. */
+.fct--en.fct--edge-r .fct-qr { left: calc(var(--mm) * 4.6); }
+.fct--en.fct--edge-r .fct-colophon { left: calc(var(--mm) * 23.6); }
+
+/* ── print: no screened greys ───────────────────────────── */
+
+/* On press a 47 % grey becomes a dot screen, ragged at 7 pt: the secondary lines go solid warm black,
+   kept quieter by size and weight (the team 7.5 pt 400 under a 13.5 pt 500 name) instead of tone. */
+.fct--print .fct-zh-team { color: var(--card-ink); }
+.fct--print .fct-site { color: var(--card-ink); }
+/* Only inks print: no paper-coloured box behind the code. */
+.fct--print .fct-qr { background: none; }
+
+/* ── separations (view=print&plate=…): one ink, black at its density, on white ── */
+
+.fct--plate-peach .face__content,
+.fct--plate-lavender .face__content,
+.fct--plate-terracotta .face__content { visibility: hidden; }
+
+.fct--plate-terracotta :is(.fct-seal, .fct-mark) { visibility: visible; }
+.fct--plate-terracotta .fct-seal-ink { fill: #000; }
+.fct--plate-terracotta .fct-mark svg { stroke: #000; }
+
+.fct--plate-text .face__content { filter: brightness(0); }
+.fct--plate-text :is(.fct-seal, .fct-mark) { visibility: hidden; }

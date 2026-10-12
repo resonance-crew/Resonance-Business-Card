@@ -1,0 +1,152 @@
+/* Direction A 相遇 / Meeting. Every size is a printed size: var(--mm), var(--pt). */
+
+.meet-face {
+  --meet-ink: oklch(26% 0.03 60);
+  --meet-muted: oklch(47% 0.035 65);
+  --meet-accent: oklch(54.5% 0.125 45);
+  --meet-left: calc(var(--mm) * 6.4);
+  --meet-edge: calc(var(--mm) * 6);
+  color: var(--meet-ink);
+  font-kerning: normal;
+  text-rendering: geometricPrecision;
+}
+.meet-face p,
+.meet-face h3 { margin: 0; font-weight: inherit; }
+
+/* ── front ─────────────────────────────────────────────── */
+.meet-mark {
+  position: absolute;
+  left: var(--meet-left);
+  top: var(--meet-edge);
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+  line-height: 1;
+}
+.meet-wave {
+  width: calc(var(--mm) * 4.3);
+  height: calc(var(--mm) * 4.3);
+  margin-right: calc(var(--mm) * 1.5);
+  flex: none;
+}
+.meet-wave svg { display: block; width: 100%; height: 100%; }
+.meet-word-zh {
+  font-family: 'Noto Serif TC', serif;
+  font-weight: 600;
+  font-size: calc(var(--pt) * 7.2);
+  letter-spacing: 0.1em;
+  margin-right: calc(var(--mm) * 1);
+}
+.meet-word-en {
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
+  font-size: calc(var(--pt) * 8.2);
+  letter-spacing: -0.005em;
+}
+
+.meet-line {
+  position: absolute;
+  left: var(--meet-left);
+  bottom: var(--meet-edge);
+  display: grid;
+  gap: calc(var(--mm) * 1.2);
+  line-height: 1;
+  white-space: nowrap;
+}
+.meet-line-zh {
+  font-family: 'Noto Serif TC', serif;
+  font-weight: 500;
+  /* 7.8 pt with 0.16em: room between the strokes of 讓 and 響 for ink on cotton. */
+  font-size: calc(var(--pt) * 7.8);
+  letter-spacing: 0.16em;
+  margin-right: -0.16em;
+}
+.meet-line-en {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-weight: 400;
+  font-size: calc(var(--pt) * 8.6);
+  color: var(--meet-muted);
+}
+
+/* ── back ──────────────────────────────────────────────── */
+.meet-who {
+  position: absolute;
+  left: var(--meet-left);
+  top: calc(var(--mm) * 9.5);
+  display: grid;
+  gap: calc(var(--mm) * 2.6);
+  white-space: nowrap;
+}
+.meet-name {
+  display: flex;
+  align-items: baseline;
+  gap: calc(var(--mm) * 2.6);
+  line-height: 1;
+}
+.meet-name-zh {
+  font-family: 'Noto Serif TC', serif;
+  font-weight: 500;
+  font-size: calc(var(--pt) * 11);
+  letter-spacing: 0.16em;
+  margin-right: -0.16em;
+}
+.meet-name-en {
+  font-family: 'Playfair Display', serif;
+  font-weight: 400;
+  font-size: calc(var(--pt) * 12.5);
+  letter-spacing: 0.005em;
+}
+.meet-team {
+  display: flex;
+  align-items: baseline;
+  gap: calc(var(--mm) * 1.8);
+  line-height: 1;
+  color: var(--meet-accent);
+}
+.meet-team-zh {
+  font-family: 'Noto Sans TC', sans-serif;
+  font-weight: 500;
+  font-size: calc(var(--pt) * 7);
+  letter-spacing: 0.14em;
+  margin-right: -0.14em;
+}
+.meet-team-en {
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 500;
+  font-size: calc(var(--pt) * 7.6);
+  letter-spacing: 0.01em;
+}
+
+.meet-reach {
+  position: absolute;
+  left: var(--meet-left);
+  bottom: var(--meet-edge);
+  display: flex;
+  align-items: flex-end;
+  gap: calc(var(--mm) * 3.6);
+}
+.meet-qr { width: calc(var(--mm) * 14.4); height: calc(var(--mm) * 14.4); flex: none; }
+.meet-qr svg { display: block; width: 100%; height: 100%; }
+.meet-contact {
+  display: grid;
+  gap: calc(var(--mm) * 1.5);
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 400;
+  font-size: calc(var(--pt) * 7.2);
+  line-height: 1;
+  letter-spacing: 0.01em;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.meet-contact span:last-child { color: var(--meet-muted); }
+
+/* The print file: every word is on the warm black plate (the mark and the team name too). */
+.meet-print { --meet-muted: var(--meet-ink); --meet-accent: var(--meet-ink); }
+
+/* One language alone: the name carries the face, and the one brand line is in full ink. */
+.meet-lang-zh .meet-name-zh { font-size: calc(var(--pt) * 13); letter-spacing: 0.26em; margin-right: -0.26em; }
+.meet-lang-en .meet-name-en { font-size: calc(var(--pt) * 13.5); }
+.meet-lang-zh .meet-word-zh { font-size: calc(var(--pt) * 8); letter-spacing: 0.16em; }
+.meet-lang-en .meet-word-en { font-size: calc(var(--pt) * 8.6); }
+.meet-lang-en .meet-line-en { color: var(--meet-ink); }

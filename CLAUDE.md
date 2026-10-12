@@ -1,0 +1,51 @@
+# CLAUDE.md
+
+The 共振 Resonance team's business card: a digital card that turns over in 3D, and print files made from
+the same design. A zero-build static site (plain ES modules, no bundler, no npm install).
+
+## Run
+
+```bash
+python3 -m http.server 4317 --bind 127.0.0.1    # then open http://127.0.0.1:4317
+```
+
+ES modules don't load from `file://`; always serve the folder.
+
+## Layout
+
+- `index.html` — the proposal page: direction tabs, the 3D card, people / language / motion / grain
+  toggles, the print proof (both faces flat with bleed and crop marks), the mission statement.
+- `card.html#<person>` — the digital card as a recipient sees it (one person, the direction in `js/share.js` `DIRECTION`):
+  turn it over, save the contact (vCard), copy the e-mail, read what Resonance is. Speaks the visitor's language.
+  Hosted on GitHub Pages; every printed card's QR code opens its person's page (`CARD_BASE` in `js/people.js`).
+- `js/app.js` — the shell. `js/card3d.js` — the 3D card (Motion springs from jsDelivr: lean, glare,
+  tap / drag / Enter / ← → to turn, painted edges). `js/blobs.js` — the metaball engine ported from
+  the Resonance repo's `src/lib/design/driftingBlobs.ts` (canvas on screen, vector SVG for print).
+  `js/people.js` — the team, the brand copy, the palette. `js/qr.js` — QR codes as SVG.
+- `directions/<id>.js|.css` — one design direction each (`meet` 相遇, `facets` 兩面, `story` 故事卡).
+  The contract is documented at the top of `js/app.js` and in `docs/BRIEF.md`.
+- `print/` — generated print files. `tools/` — headless Chrome helpers.
+
+## Design rules that matter
+
+- Faces are laid out in true print units: every face has `--mm` and `--pt` CSS custom properties
+  (one millimetre / point of the printed card), so screen and print are the same design. Blob
+  coordinates are in 0.1 mm (a 90 × 54 mm card is 900 × 540; the art layer adds 2 mm bleed).
+- Chinese set beside Latin runs ~0.85–0.9× the Latin size (CJK fills the em box). Print minimums:
+  Latin 6.5 pt, Chinese 7 pt; keep words ≥ 4 mm inside the trim.
+- No digital grain in print (`ctx.grain` is 0 there); texture comes from paper or process.
+- The palette and fonts are the Resonance site's (tokens.css there is the source of truth).
+- E-mail addresses in `js/people.js` are samples until each person confirms theirs.
+
+## Check
+
+```bash
+node tools/shot.mjs "/?d=meet&view=card&motion=still" /tmp/front.png 1000 700 2
+node tools/shot.mjs "/?d=meet" /tmp/mobile.png 390 1800 2       # any width; --wait=ms of real time after ready
+node tools/export.mjs meet --people=chen                         # print/meet/chen.pdf + 300 dpi PNGs
+# then open /tools/qr-check.html: every exported QR must decode to its person's card URL
+```
+
+`tools/shot.mjs` and `tools/export.mjs` drive Chrome over the DevTools protocol (`tools/cdp.mjs`): real time, exact
+viewport sizes, exact PDF page boxes (Chrome rounds them; `exactBoxes` fixes it in place), 300 dpi PNGs.
+The PDF carries inks only: the cream paper is the stock, never a printed flood. Pushing to main deploys to GitHub Pages.
