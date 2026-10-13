@@ -14,6 +14,8 @@
  *   onSide(fn) live: fn('front' | 'back') as the card turns; else never
  *   side      the side showing now
  *   paintEdge(name, css)  paint one edge of the 3D card (l / r / t / b); no-op elsewhere
+ *   typeReady  null, or a promise from the page that sets the faces' type as images (share.js): a moment
+ *             that waits for the card's type waits for it, and the direction asks for no fonts of its own
  */
 import { PEOPLE, BRAND, INK, waveMark, cardUrl } from './people.js';
 import * as blobs from './blobs.js';
@@ -43,9 +45,9 @@ export function flatFace(side) {
 /**
  * @param dir    a direction module
  * @param mode   'live' | 'still' | 'print'
- * @param opts   { personId, lang, grain (bool), url, card, host }
+ * @param opts   { personId, lang, grain (bool), pose, url, card, host, typeReady }
  */
-export function makeCtx(dir, mode, { personId, lang, grain = true, pose = null, url = null, card = null, host = null } = {}) {
+export function makeCtx(dir, mode, { personId, lang, grain = true, pose = null, url = null, card = null, host = null, typeReady = null } = {}) {
   const trim = trimOf(dir);
   const person = PEOPLE.find((x) => x.id === personId) ?? PEOPLE[0];
   const stops = [];
@@ -68,6 +70,7 @@ export function makeCtx(dir, mode, { personId, lang, grain = true, pose = null, 
     waveMark,
     // What the QR code opens: this person's own digital card.
     url: url ?? cardUrl(person),
+    typeReady,
     get side() {
       return card ? card.side : 'front';
     },

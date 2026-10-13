@@ -149,6 +149,19 @@ export async function launch() {
       fs.writeFileSync(out, Buffer.from(data, 'base64'));
       return out;
     },
+    /**
+     * The whole page at exactly `width` × `height` device px with nothing behind it (alpha), as a PNG:
+     * laid out `width / scale` CSS px wide, so a page that fills the window's width scales with it.
+     */
+    async layer(target, out, { width, height, scale = 4 }) {
+      await send('Emulation.setDefaultBackgroundColorOverride', { color: { r: 0, g: 0, b: 0, a: 0 } });
+      await open(target, { width: width / scale, height: height / scale, scale });
+      const { data } = await send('Page.captureScreenshot', { format: 'png', captureBeyondViewport: false });
+      await send('Emulation.setDefaultBackgroundColorOverride', {});
+      fs.mkdirSync(path.dirname(path.resolve(out)), { recursive: true });
+      fs.writeFileSync(out, Buffer.from(data, 'base64'));
+      return out;
+    },
     /** The viewport as it is now (after evaluate() has acted on the page). */
     async capture(out) {
       const { data } = await send('Page.captureScreenshot', { format: 'png' });

@@ -18,6 +18,8 @@
 | `index.html` | 提案頁。三個設計方向可以切換，也可以換成員、語言、動態或靜態、有無顆粒感。下方是兩面的印刷稿，標出出血和裁切線 |
 | `ncc.html` `liball.html` `nunu.html` `ted.html` | 收到名片的人看到的頁面（網址 `/ncc` 等）：一張卡片，點一下翻面，下面可以存到聯絡人、複製 Email、認識共振。頁面語言跟著對方的瀏覽器，中文訪客先看到中文面。這四頁由 `card.html` 產生：改了 `card.html` 或成員資料後執行 `node tools/short-pages.mjs` |
 
+收到名片的頁面上，卡面的字、落款印和 QR 碼是預先畫好的透明圖片（`assets/type/`，每面約 15–30 KB），疊在會動的泡泡上。LINE、Facebook 的內建瀏覽器會照手機的字型大小放大網頁文字，直接排字的話名字會壓到印章、Email 超出卡片；換成圖片後，卡面在任何瀏覽器都和設計一樣，也不用等卡面的字型載入。圖片載入失敗時，卡面會改回直接排字。
+
 卡片的動作：滑鼠移上去會傾斜、反光；點一下、左右拖曳或按 <kbd>Enter</kbd> 翻面。卡片有厚度，翻面時看得到紙邊。
 
 ## 三個方向
@@ -69,6 +71,7 @@ python3 -m http.server 4317 --bind 127.0.0.1
 | 數位名片預設用哪個方向 | `js/share.js` 的 `DIRECTION` |
 | QR 碼連到哪裡、個人短網址 | `js/people.js` 的 `CARD_BASE` 和每個人的 `short` |
 | 某個方向的版面 | `directions/<方向>.js`、`directions/<方向>.css` |
+| 數位名片卡面的圖片 | 改了 B 兩面的版面、成員資料或網址之後，執行 `node tools/type-images.mjs` 重新產生 `assets/type/` |
 
 每個方向都用印刷的實際單位排版：`--mm` 是成品上的一公釐，`--pt` 是一點。所以螢幕和印刷是同一份設計，螢幕只是放大縮小。
 
@@ -83,7 +86,8 @@ js/ctx.js, js/app.js      方向模組的介面、提案頁
 js/share.js               數位名片頁（css/organic.css、js/organic.js：從官網移植的手繪按鈕、分隔線、連結底線、語言切換）
 js/people.js, js/qr.js    成員與品牌資料、QR 碼
 directions/               三個設計方向
-tools/                    截圖、印刷檔輸出、QR 檢查（headless Chrome）、個人頁產生器（short-pages.mjs）
+tools/                    截圖、印刷檔輸出、QR 檢查（headless Chrome）、個人頁產生器（short-pages.mjs）、卡面圖片（type-images.mjs）
+assets/type/              數位名片卡面的字（透明 WebP，由 type-images.mjs 產生）
 docs/BRIEF.md             設計簡報：品牌、單位、字級與印刷規則
 print/                    印刷檔
 ```

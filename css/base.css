@@ -413,6 +413,30 @@ button { font: inherit; color: inherit; }
 }
 .face__art > svg, .face__art > canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
 .face__content { position: absolute; inset: 0; }
+/* The type as an image (the recipient's page: tools/type-images.mjs): over the blobs, under the glare,
+   in place of the face's own text, which stays in the page only for the image's alt. */
+.face__type {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-user-drag: none;
+  -webkit-touch-callout: none;
+}
+.face.is-typeset > .face__content { display: none; }
+
+/* Browsers without container units (Safari < 16, Chrome < 105: iPhones left on iOS 15, old Android
+   WebViews): the 3D card measures itself (--mm-px, card3d.js), so its faces keep their millimetres. */
+@supports not (width: 1cqw) {
+  .c3-card .face { --mm: var(--mm-px, 6px); }
+}
+@supports not (aspect-ratio: 1) {
+  .c3-card { height: calc(var(--mm-px, 6px) * var(--trim-h)); }
+}
 
 /* A face alone on a page: the PDF and the PNG proofs (view=print). */
 .print-only body, body.print-only { background: transparent; }

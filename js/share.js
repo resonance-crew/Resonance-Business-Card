@@ -96,8 +96,12 @@ async function render() {
     roleLabel: ui === 'zh' ? '名片' : 'card',
   });
   $('#stage').dataset.orientation = dir.orientation;
-  const ctx = makeCtx(dir, 'live', { personId, lang: cardLang(dir), card, host: card.stage });
+  const lang = cardLang(dir);
+  // The type as images where they're made (the team's direction): see typeLayers.
+  const typeset = dir.id === DIRECTION ? typeLayers(card, lang) : null;
+  const ctx = makeCtx(dir, 'live', { personId, lang, card, host: card.stage, typeReady: typeset?.ready ?? null });
   const instance = dir.mount({ front: faceParts(card.front), back: faceParts(card.back) }, ctx);
+  typeset?.describe();
   current = { card, ctx, instance };
 
   $('#hint').textContent = t.hint;
@@ -111,7 +115,60 @@ async function render() {
   $('#lang .lang-label').textContent = t.other;
   $('#lang').lang = ui === 'zh' ? 'en' : 'zh-Hant';
   $('#status').textContent = '';
-  fontsSettled(card.stage).then(() => (document.documentElement.dataset.ready = '1'));
+  (typeset ? typeset.ready : fontsSettled(card.stage)).then(() => (document.documentElement.dataset.ready = '1'));
+}
+
+/**
+ * The card's type as images (assets/type/, made by tools/type-images.mjs): each face's words, seal and QR
+ * code, laid over its live blobs in place of the face's own text. In-app browsers (LINE, Facebook) scale
+ * text with the phone's font size, so set as text the name ran into its seal and the e-mail off the card;
+ * an image keeps every line where it was drawn, needs none of the card's fonts, and is ~15–30 KB a face.
+ * The face's text stays in the page, hidden, as the image's alt. If an image can't load, the faces set
+ * their own type as before.
+ */
+function typeLayers(card, lang) {
+  const sides = { front: card.front, back: card.back };
+  const images = Object.entries(sides).map(([side, face]) => {
+    const img = document.createElement('img');
+    img.className = 'face__type';
+    img.alt = '';
+    img.decoding = 'async';
+    img.draggable = false;
+    face.querySelector('.face__content').after(img);
+    face.classList.add('is-typeset');
+    const loaded = new Promise((res, rej) => {
+      img.onload = res;
+      img.onerror = rej;
+    });
+    img.src = new URL(`../assets/type/${DIRECTION}/${personId}/${lang}-${side}.webp`, import.meta.url).href;
+    return { face, img, loaded };
+  });
+  const ready = Promise.all(images.map((x) => x.loaded)).then(
+    () => true,
+    () => {
+      for (const { face, img } of images) {
+        img.remove();
+        face.classList.remove('is-typeset');
+      }
+      return false;
+    },
+  );
+  return {
+    ready,
+    /** After the direction has set the faces' text: each image's alt is its face's words, in their language. */
+    describe() {
+      for (const { face, img } of images) {
+        const content = face.querySelector('.face__content');
+        // Each element's own words, a space between (the family name is a span of its own beside the given).
+        img.alt = [...content.querySelectorAll('*')]
+          .map((el) => [...el.childNodes].filter((n) => n.nodeType === 3).map((n) => n.textContent).join('').trim())
+          .filter(Boolean)
+          .join(' ');
+        const lang = content.querySelector('[lang]')?.lang;
+        if (lang) img.lang = lang;
+      }
+    },
+  };
 }
 
 function vcard() {

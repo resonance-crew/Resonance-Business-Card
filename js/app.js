@@ -26,6 +26,8 @@
  *   &view=card   — only the 3D card      &side=back — start turned over
  *   &view=print&side=front — one face alone at its printed size, bleed included (PDF/PNG export)
  *   &view=flat   — both faces flat, side by side, at true proportions
+ *   &view=type&side=front — one face's type alone (no blobs, no paper) on a transparent page, filling the
+ *                window's width: what tools/type-images.mjs captures for the recipient's page
  */
 import { PEOPLE, waveMark } from './people.js';
 import { createCard3D } from './card3d.js';
@@ -98,6 +100,7 @@ async function render() {
   document.documentElement.dataset.direction = dir.id;
 
   if (state.view === 'print' || state.view === 'flat') return renderFlatOnly(dir, trim);
+  if (state.view === 'type') return renderType(dir, trim);
 
   // The card.
   const stageHost = $('#stage');
@@ -318,6 +321,31 @@ function renderFlatOnly(dir, trim) {
     proofs.push({ ctx, instance: dir.mount(faces, ctx) });
   }
   current = { card: null, ctx: null, instance: null, proofs };
+  fontsSettled(document.body).then(() => (document.documentElement.dataset.ready = '1'));
+}
+
+/**
+ * view=type: one face's type layer (its content: words, seal, mark, QR code) as the screen shows it, the
+ * blobs hidden and nothing behind it, as wide as the window. tools/type-images.mjs captures it with a
+ * transparent background: the recipient's page lays these images over the live blobs, so the card reads
+ * the same whatever the browser does to text (an in-app browser's text zoom, a missing font).
+ */
+function renderType(dir, trim) {
+  document.body.className = 'print-only';
+  document.body.innerHTML = '';
+  const style = document.createElement('style');
+  style.textContent = `html, body { margin: 0; background: transparent !important } .face__art { visibility: hidden }`;
+  document.head.appendChild(style);
+  const fc = document.createElement('div');
+  fc.className = 'flat-card';
+  fc.style.cssText = `position: relative; width: 100vw; height: calc(100vw * ${trim[1]} / ${trim[0]}); container-type: inline-size; --trim-w: ${trim[0]}; --trim-h: ${trim[1]}`;
+  const face = flatFace(state.side);
+  fc.appendChild(face);
+  document.body.appendChild(fc);
+  const ctx = makeCtx(dir, 'still', ctxOpts());
+  const other = flatFace(state.side === 'front' ? 'back' : 'front');
+  const faces = state.side === 'front' ? { front: faceParts(face), back: faceParts(other) } : { front: faceParts(other), back: faceParts(face) };
+  current = { card: null, ctx: null, instance: null, proofs: [{ ctx, instance: dir.mount(faces, ctx) }] };
   fontsSettled(document.body).then(() => (document.documentElement.dataset.ready = '1'));
 }
 

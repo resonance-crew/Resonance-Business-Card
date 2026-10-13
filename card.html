@@ -39,7 +39,10 @@
     max-width: 760px;
     margin: 0 auto;
   }
-  .share-top { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+  /* A phone set to large text (LINE and Facebook's browsers scale the page's text with it) has no room for
+     both on one line: the wordmark never breaks, and the language control drops below it, at the right. */
+  .share-top { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 4px 12px; }
+  .share-top .lang-toggle { margin-left: auto; }
   .share-brand {
     display: inline-flex;
     align-items: center;
@@ -50,6 +53,7 @@
     font-weight: 700;
     font-size: 17px;
     line-height: 1;
+    white-space: nowrap;
   }
   /* The mark is a block of its own (an inline one sat on the baseline with the line's descent
      under it, so centring that box lifted the waves ~2 px) and the line is exactly the type,

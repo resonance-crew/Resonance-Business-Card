@@ -974,8 +974,9 @@ export default {
     zh.content.innerHTML = zhFace(ctx);
     en.content.innerHTML = enFace(ctx);
     // Ask for the faces' own type now, so the page's fonts.ready (what the shots and the print files
-    // wait for) waits for it too, instead of resolving before layout has asked for any font.
-    const typeLoaded = typeIn(ctx);
+    // wait for) waits for it too, instead of resolving before layout has asked for any font. When the
+    // page sets the type as images (ctx.typeReady), wait for those and load no fonts for the card.
+    const typeLoaded = ctx.typeReady ?? typeIn(ctx);
 
     const inks = inkSet(B, B.parseOklch(ink.paper), ink[PARTNER]);
 
