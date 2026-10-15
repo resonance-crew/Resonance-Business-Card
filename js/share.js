@@ -10,7 +10,7 @@
 import { PEOPLE, BRAND, waveMark, cardUrl } from './people.js';
 import { createCard3D } from './card3d.js';
 import { makeCtx, faceParts, loadDirection, fontsSettled } from './ctx.js';
-import { organicButton, organicBare, organicDivider, organicLink, globeIcon } from './organic.js';
+import { organicButton, organicBare, organicDivider, organicLink, globeIcon, arrowUpRightIcon } from './organic.js';
 
 /** The direction the team picked. */
 export const DIRECTION = 'facets';
@@ -107,7 +107,7 @@ async function render() {
   $('#hint').textContent = t.hint;
   $('#save .o-label').textContent = t.save;
   $('#copy .o-label').textContent = t.copy;
-  $('#about-link .o-label').firstChild.textContent = t.about + ' ';
+  $('#about-link .o-label').firstChild.textContent = t.about;
   $('#about-link').href = `${BRAND.url}/${ui === 'zh' ? 'zh-TW' : 'en'}/about`;
   $('#about-title').textContent = t.aboutTitle;
   $('#mission').textContent = MISSION[ui];
@@ -194,6 +194,7 @@ function init() {
   // The Resonance site's hand-drawn controls (js/organic.js): filled wobbly buttons, the frameless
   // globe, a wavy rule, a pen's wavy underline. Seeds are the site's own, one per element.
   $('#lang').insertAdjacentHTML('afterbegin', globeIcon());
+  $('#about-link .o-arrow').innerHTML = arrowUpRightIcon();
   organicBare($('#lang'), { seed: 53 });
   organicButton($('#save'), { variant: 'solid', seed: 3 });
   organicButton($('#copy'), { variant: 'tonal', seed: 601 });

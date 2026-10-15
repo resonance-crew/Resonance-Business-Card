@@ -218,6 +218,22 @@ export function globeIcon(strokeWidth = INK_STRONG) {
   );
 }
 
+/**
+ * An arrow up toward the right ("opens elsewhere"), in the hand of the site's icons (Icon `share`,
+ * `arrow-right`): the shaft swept up in one bowed stroke, the head one flick from its upper wing round the
+ * tip and down, the wings unequal and the pen running a little past where it turns. Its viewBox hugs
+ * the drawing, so at 13 px the stroke reads at the weight of the 600 label beside it.
+ */
+export function arrowUpRightIcon(strokeWidth = INK_STRONG) {
+  return (
+    `<svg class="o-arrow-svg" viewBox="4 4 16 16" fill="none" stroke="currentColor" stroke-width="${strokeWidth}" ` +
+    `stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">` +
+    `<path d="M5.9,18.3 C9.4,16.9 13.5,12.6 17.3,6.9"/>` +
+    `<path d="M9.8,6.6 C12.4,6.0 15.2,6.0 17.9,6.3 C18.1,8.8 17.9,11.4 17.0,13.9"/>` +
+    `</svg>`
+  );
+}
+
 /* ── DOM ──────────────────────────────────────────────────────────────── */
 
 const NS = 'http://www.w3.org/2000/svg';
