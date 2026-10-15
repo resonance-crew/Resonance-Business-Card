@@ -18,7 +18,7 @@ export const PEOPLE = [
     given: 'Nian-Cheng',
     family: 'Chen',
     photo: 'assets/team/chen.webp',
-    email: 'nian-cheng@resonance.channel',
+    email: 'ncc@resonance.channel',
     seed: 11,
   },
   {
