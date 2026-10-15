@@ -51,7 +51,7 @@ export const PEOPLE = [
     given: 'Yi-Hsin',
     family: 'Cheng',
     photo: 'assets/team/cheng.webp',
-    email: 'yi-hsin@resonance.channel',
+    email: 'ted@resonance.channel',
     seed: 83,
   },
 ];
