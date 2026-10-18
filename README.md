@@ -6,7 +6,7 @@
 
 ## 線上看
 
-- 每個人的數位名片：[hi.resonance.channel/ncc](https://hi.resonance.channel/ncc)（陳念誠）、[/liball](https://hi.resonance.channel/liball)（蕭力文）、[/nunu](https://hi.resonance.channel/nunu)（方昱晴）、[/ted](https://hi.resonance.channel/ted)（鄭義信）
+- 每個人的數位名片：[hi.resonance.channel/ncc](https://hi.resonance.channel/ncc)（陳念誠）、[/liball](https://hi.resonance.channel/liball)（蕭力文）、[/nunu](https://hi.resonance.channel/nunu)（方昱晴）、[/ted](https://hi.resonance.channel/ted)（鄭義信）、[/winnie](https://hi.resonance.channel/winnie)（薛惠馨）
 - 提案頁：<https://hi.resonance.channel/>
 
 印刷版上的 QR 碼連到的就是各自的數位名片。網域 `hi.resonance.channel` 是 Cloudflare 上的一筆 CNAME（指向 `resonance-crew.github.io`，僅 DNS），網站本身由 GitHub Pages 提供，官網不受影響。
@@ -16,7 +16,7 @@
 | 頁面 | 內容 |
 | --- | --- |
 | `index.html` | 提案頁。三個設計方向可以切換，也可以換成員、語言、動態或靜態、有無顆粒感。下方是兩面的印刷稿，標出出血和裁切線 |
-| `ncc.html` `liball.html` `nunu.html` `ted.html` | 收到名片的人看到的頁面（網址 `/ncc` 等）：一張卡片，點一下翻面，下面可以存到聯絡人、複製 Email、認識共振。頁面語言跟著對方的瀏覽器，中文訪客先看到中文面。這四頁由 `card.html` 產生：改了 `card.html` 或成員資料後執行 `node tools/short-pages.mjs` |
+| `ncc.html` `liball.html` `nunu.html` `ted.html` `winnie.html` | 收到名片的人看到的頁面（網址 `/ncc` 等）：一張卡片，點一下翻面，下面可以存到聯絡人、複製 Email、認識共振。頁面語言跟著對方的瀏覽器，中文訪客先看到中文面。這幾頁由 `card.html` 產生：改了 `card.html` 或成員資料後執行 `node tools/short-pages.mjs` |
 
 收到名片的頁面上，卡面的字、落款印和 QR 碼是預先畫好的透明圖片（`assets/type/`，每面約 15–30 KB），疊在會動的泡泡上。LINE、Facebook 的內建瀏覽器會照手機的字型大小放大網頁文字，直接排字的話名字會壓到印章、Email 超出卡片；換成圖片後，卡面在任何瀏覽器都和設計一樣，也不用等卡面的字型載入。圖片載入失敗時，卡面會改回直接排字。
 
@@ -67,7 +67,7 @@ python3 -m http.server 4317 --bind 127.0.0.1
 
 | 想改的東西 | 在哪裡 |
 | --- | --- |
-| 成員、Email、品牌文案、色票 | `js/people.js` |
+| 成員、Email、品牌文案、色票 | `js/people.js`（新增成員後執行 `short-pages.mjs`、`type-images.mjs`、`export.mjs`，工具都從這裡讀名單；A 相遇的 `WHO`、C 故事卡的 `PAIRS` 可以指定他的配色） |
 | 數位名片預設用哪個方向 | `js/share.js` 的 `DIRECTION` |
 | QR 碼連到哪裡、個人短網址 | `js/people.js` 的 `CARD_BASE` 和每個人的 `short` |
 | 某個方向的版面 | `directions/<方向>.js`、`directions/<方向>.css` |

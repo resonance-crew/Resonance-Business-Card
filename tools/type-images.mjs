@@ -24,6 +24,7 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { launch } from './cdp.mjs';
+import { PEOPLE } from '../js/people.js';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const args = process.argv.slice(2);
@@ -32,7 +33,7 @@ const direction = /export const DIRECTION = '([a-z-]+)'/.exec(fs.readFileSync(pa
 const src = fs.readFileSync(path.join(ROOT, 'directions', `${direction}.js`), 'utf8');
 const portrait = /orientation:\s*['"]portrait['"]/.test(src);
 const langs = [...(/langs:\s*\[([\s\S]*?)\]/.exec(src)?.[1] ?? '').matchAll(/id:\s*'([a-z-]+)'/g)].map((m) => m[1]);
-const people = flag('people')?.split(',') ?? ['chen', 'hsiao', 'fang', 'cheng'];
+const people = flag('people')?.split(',') ?? PEOPLE.map((p) => p.id);
 
 /** Device px per printed mm. */
 const PX_PER_MM = 20;

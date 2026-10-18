@@ -51,7 +51,7 @@ const SECONDS = {
   sky: { lab: laid(INK.sky, 0.78), arc: -1, dip: 0.5, toFused: 1 },
   yellow: { lab: laid(INK.yellow, 0.9), arc: 0, dip: 0 },
 };
-const WHO = { chen: 'lavender', hsiao: 'sage', fang: 'sky', cheng: 'yellow' };
+const WHO = { chen: 'lavender', hsiao: 'sage', fang: 'sky', cheng: 'yellow', hsueh: 'sage' };
 const ORDER = ['lavender', 'sage', 'sky', 'yellow'];
 /**
  * What every meeting becomes: one warm peach-rose, between the brand's peach

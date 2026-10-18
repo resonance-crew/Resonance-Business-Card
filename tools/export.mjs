@@ -17,12 +17,13 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { launch } from './cdp.mjs';
+import { PEOPLE as TEAM } from '../js/people.js';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const args = process.argv.slice(2);
 const flag = (name) => args.find((a) => a.startsWith(`--${name}=`))?.split('=')[1];
 const ALL = ['meet', 'facets', 'story'];
-const PEOPLE = ['chen', 'hsiao', 'fang', 'cheng'];
+const PEOPLE = TEAM.map((p) => p.id);
 const dirs = args.filter((a) => !a.startsWith('--'));
 const directions = dirs.length ? dirs : ALL;
 const people = flag('people')?.split(',') ?? PEOPLE;

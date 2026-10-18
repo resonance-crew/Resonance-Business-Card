@@ -220,7 +220,7 @@ const FAMILIES = {
 /**
  * Whose card is which family, and whose blob it melts with (the colour the
  * answer comes in). The first colours are the ones the site already gives
- * them: 念 peach, 蕭 lavender, 方 sage; 鄭 sky. A third entry 'warm' turns the
+ * them: 念 peach, 蕭 lavender, 方 sage; 鄭 sky; 薛 butter. A third entry 'warm' turns the
  * melt the warm way round the hue circle (see WARM_WAY).
  */
 const PAIRS = {
@@ -228,6 +228,7 @@ const PAIRS = {
   hsiao: ['lavender', 'yellow'],
   fang: ['sage', 'terracotta'],
   cheng: ['sky', 'terracotta', 'warm'],
+  hsueh: ['yellow', 'terracotta'],
 };
 const FALLBACK = [
   ['terracotta', 'lavender'],

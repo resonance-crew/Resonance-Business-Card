@@ -54,6 +54,19 @@ export const PEOPLE = [
     email: 'ted@resonance.channel',
     seed: 83,
   },
+  {
+    id: 'hsueh',
+    short: 'winnie',
+    zh: '薛惠馨',
+    // Her English name, which she goes by (the others' are their passports' romanisation).
+    en: 'Winnie Hsueh',
+    given: 'Winnie',
+    family: 'Hsueh',
+    // Not on the site's About page yet: no portrait.
+    photo: null,
+    email: 'winnie@resonance.channel',
+    seed: 113,
+  },
 ];
 
 /**

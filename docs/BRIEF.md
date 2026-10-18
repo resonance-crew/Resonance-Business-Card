@@ -44,8 +44,10 @@ A story is answered by another story; `everyone`; `cycle` 共振・立體・體�
   only: no school, major, year or title". A business card is the most flattening object there is; this
   one should not flatten. So: **no invented job titles**. The team name is `BRAND.team`
   (共振小隊 / The Resonance Crew).
-- Team: `PEOPLE` in `js/people.js` (Chinese name, English name as on their passports, a photo, a SAMPLE
-  e-mail). Photos are small square webp portraits in `assets/team/`.
+- Team: `PEOPLE` in `js/people.js` (Chinese name, English name as on their passports — or the English name
+  they go by, as Winnie's — a photo, a SAMPLE e-mail). Photos are small square webp portraits in `assets/team/`
+  (none yet for Winnie, who isn't on the About page). Directions A and C give each person colours of their own
+  (`WHO` in meet.js, `PAIRS` in story.js); everything else, the tools included, reads the list from people.js.
 
 ## The folder and the contract
 
@@ -172,7 +174,7 @@ node tools/shot.mjs "/?d=<id>" $SHOTS/<id>-mobile.png 390 1800 2                
 node tools/shot.mjs "/?d=<id>" $SHOTS/<id>-dark.png 1280 900 1 --dark
 ```
 
-Add `&p=hsiao` (or fang, cheng) to see another person, `&lang=<id>` for a language option,
+Add `&p=hsiao` (or fang, cheng, hsueh) to see another person, `&lang=<id>` for a language option,
 `&grain=0` to turn the grain off, `&motion=live` (default) to catch a moving frame
 (the card's arrival animation runs for ~1.5 s; `--wait=6000` gives it time).
 Use the Read tool on the PNGs to look at them. `$SHOTS` is given in your task.

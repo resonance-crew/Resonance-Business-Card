@@ -17,7 +17,7 @@ ES modules don't load from `file://`; always serve the folder.
   toggles, the print proof (both faces flat with bleed and crop marks), the mission statement.
 - `card.html#<person>` — the digital card as a recipient sees it (one person, the direction in `js/share.js` `DIRECTION`):
   turn it over, save the contact (vCard), copy the e-mail, read what Resonance is. Speaks the visitor's language.
-  Each person also has a short page, `<short>.html` (ncc, liball, nunu, ted), GENERATED from card.html by
+  Each person also has a short page, `<short>.html` (ncc, liball, nunu, ted, winnie), GENERATED from card.html by
   `node tools/short-pages.mjs` (run it after editing card.html or js/people.js). Hosted on GitHub Pages at the custom
   domain hi.resonance.channel (a DNS-only CNAME in Cloudflare); every printed card's QR code opens `CARD_BASE + short`.
   On this page the card's TYPE is images: `assets/type/<direction>/<person>/<lang>-<side>.webp` (each face's words, seal,
