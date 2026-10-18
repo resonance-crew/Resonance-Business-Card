@@ -174,7 +174,7 @@ node tools/shot.mjs "/?d=<id>" $SHOTS/<id>-mobile.png 390 1800 2                
 node tools/shot.mjs "/?d=<id>" $SHOTS/<id>-dark.png 1280 900 1 --dark
 ```
 
-Add `&p=hsiao` (or fang, cheng, hsueh) to see another person, `&lang=<id>` for a language option,
+Add `&p=hsiao` (or fang, cheng, xue) to see another person, `&lang=<id>` for a language option,
 `&grain=0` to turn the grain off, `&motion=live` (default) to catch a moving frame
 (the card's arrival animation runs for ~1.5 s; `--wait=6000` gives it time).
 Use the Read tool on the PNGs to look at them. `$SHOTS` is given in your task.

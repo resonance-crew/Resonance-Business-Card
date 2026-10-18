@@ -29,7 +29,7 @@ export const PEOPLE = [
     given: 'Li-Wen',
     family: 'Hsiao',
     photo: 'assets/team/hsiao.webp',
-    email: 'li-wen@resonance.channel',
+    email: 'liball@resonance.channel',
     seed: 37,
   },
   {
@@ -55,13 +55,13 @@ export const PEOPLE = [
     seed: 83,
   },
   {
-    id: 'hsueh',
+    id: 'xue',
     short: 'winnie',
     zh: '薛惠馨',
-    // Her English name, which she goes by (the others' are their passports' romanisation).
-    en: 'Winnie Hsueh',
+    // Her English name, which she goes by (the others' are their passports' romanisation), and her spelling of 薛.
+    en: 'Winnie Xue',
     given: 'Winnie',
-    family: 'Hsueh',
+    family: 'Xue',
     // Not on the site's About page yet: no portrait.
     photo: null,
     email: 'winnie@resonance.channel',

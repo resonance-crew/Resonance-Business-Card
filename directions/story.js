@@ -228,7 +228,7 @@ const PAIRS = {
   hsiao: ['lavender', 'yellow'],
   fang: ['sage', 'terracotta'],
   cheng: ['sky', 'terracotta', 'warm'],
-  hsueh: ['yellow', 'terracotta'],
+  xue: ['yellow', 'terracotta'],
 };
 const FALLBACK = [
   ['terracotta', 'lavender'],
