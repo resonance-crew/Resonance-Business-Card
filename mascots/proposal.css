@@ -1,0 +1,76 @@
+/* The mascot proposal page. The card faces use css/base.css and directions/facets.css as the proof does. */
+.mp {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: clamp(28px, 5vw, 64px) var(--gutter) 96px;
+}
+.mp h1 {
+  font-family: var(--font-display);
+  font-size: clamp(28px, 4vw, 40px);
+  line-height: 1.2;
+  margin: 0 0 8px;
+}
+.mp h2 {
+  font-family: var(--font-display);
+  font-size: clamp(22px, 3vw, 28px);
+  line-height: 1.25;
+  margin: 0 0 6px;
+}
+.mp h2 small { font-family: var(--font-body); font-size: 15px; font-weight: 500; color: var(--ink-soft); margin-left: 10px; }
+.mp h3 { font-size: 15px; margin: 0 0 6px; }
+.mp h3.ring-title { margin-top: 28px; }
+.mp code { font-size: 0.92em; }
+.mp p { margin: 0 0 10px; }
+.mp .lede { color: var(--ink-soft); max-width: 46em; }
+.mp section { margin-top: clamp(40px, 6vw, 72px); }
+
+.answers { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; margin-top: 20px; }
+.answers > div { background: var(--chip); border: 1px solid var(--rule); border-radius: 14px; padding: 16px 18px; }
+.answers b { display: block; color: var(--accent-ink); font-size: 13px; letter-spacing: 0.08em; margin-bottom: 4px; }
+
+.option { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: clamp(20px, 3vw, 40px); align-items: start; }
+@media (max-width: 860px) { .option { grid-template-columns: minmax(0, 1fr); } }
+/* A spread is (54 + 54 + 2 × 4) mm wide: one millimetre is as many px as the column allows, 5.2 at most. */
+.option .spread { margin: 0 auto; --mm-px: min(5.2px, calc((100vw - 2 * var(--gutter) - 2px) / 116)); }
+.team .spread { --mm-px: min(2.9px, calc((100vw - 2 * var(--gutter) - 2px) / 116)); }
+.option__letter {
+  display: inline-grid; place-items: center; width: 30px; height: 30px; border-radius: 50%;
+  background: var(--accent); color: var(--accent-on); font-weight: 600; margin-right: 10px; font-size: 15px;
+  vertical-align: 4px;
+}
+.pick { display: inline-block; font-size: 12px; font-weight: 600; letter-spacing: 0.08em; color: var(--accent-on); background: var(--accent); border-radius: 999px; padding: 2px 10px; margin-left: 8px; vertical-align: 6px; }
+.spec { display: grid; grid-template-columns: 5.5em minmax(0, 1fr); gap: 6px 12px; margin: 14px 0; font-size: 14px; }
+.spec dt { color: var(--accent-ink); font-weight: 600; }
+.spec dd { margin: 0; }
+.pros, .cons { font-size: 14px; margin: 8px 0 0; padding-left: 1.2em; }
+.pros li::marker { content: '＋ '; color: var(--accent-ink); }
+.cons li::marker { content: '－ '; color: var(--ink-soft); }
+.caption { font-size: 12px; color: var(--ink-soft); text-align: center; margin-top: 8px; letter-spacing: 0.06em; }
+
+.team { display: flex; flex-wrap: wrap; gap: 18px; justify-content: center; margin-top: 18px; }
+.team-card { margin: 0; display: grid; gap: 6px; justify-items: center; }
+.team-card figcaption { font-size: 13px; color: var(--ink-soft); }
+
+.note { background: var(--chip); border-left: 3px solid var(--accent); padding: 14px 18px; border-radius: 0 12px 12px 0; font-size: 14px; }
+
+/* The first round's puppets: a layer over the type, inside the face, clipped at the trim with the card. */
+.flat-card .pup-layer { position: absolute; inset: 0; z-index: 2; pointer-events: none; }
+.flat-card.no-blob .face__art { visibility: hidden; }
+.pup { position: absolute; }
+.pup__body, .pup__face { position: absolute; inset: 0; }
+.pup__part { position: absolute; display: block; max-width: none; user-select: none; }
+.res-waves { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.res-waves polyline { fill: none; stroke: oklch(62% 0.14 45 / 0.85); stroke-width: 0.32; stroke-linecap: round; stroke-linejoin: round; }
+
+/* On screen: a blink every few seconds and the waving arm. Stills (`?still`) show the first frame. */
+.pup__eye-shut { opacity: 0; }
+html:not(.still) .pup__eye-shut { animation: pup-blink-shut 4.6s steps(1) infinite; }
+html:not(.still) .pup__eye-open { animation: pup-blink-open 4.6s steps(1) infinite; }
+@keyframes pup-blink-shut { 0%, 92% { opacity: 0; } 94%, 97% { opacity: 1; } 99% { opacity: 0; } }
+@keyframes pup-blink-open { 0%, 92% { opacity: 1; } 94%, 97% { opacity: 0; } 99% { opacity: 1; } }
+.pup__wave { transform: rotate(var(--from)); }
+html:not(.still) .pup__wave { animation: pup-wave 1.4s ease-in-out infinite alternate; }
+@keyframes pup-wave { from { transform: rotate(var(--from)); } to { transform: rotate(var(--to)); } }
+@media (prefers-reduced-motion: reduce) {
+  .pup__wave, .pup__eye-shut, .pup__eye-open { animation: none !important; }
+}

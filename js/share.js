@@ -13,7 +13,7 @@ import { makeCtx, faceParts, loadDirection, fontsSettled } from './ctx.js';
 import { organicButton, organicBare, organicDivider, organicLink, globeIcon, arrowUpRightIcon } from './organic.js';
 
 /** The direction the team picked. */
-export const DIRECTION = 'facets';
+export const DIRECTION = 'friends';
 
 const MISSION = {
   zh:

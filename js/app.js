@@ -34,9 +34,9 @@ import { createCard3D } from './card3d.js';
 import { BLEED, makeCtx, trimOf, faceParts, flatFace, loadDirection, fontsSettled } from './ctx.js';
 
 /** The directions, in tab order (their letters), and where the review placed each. */
-const DIRECTIONS = ['meet', 'facets', 'story'];
-const DEFAULT_DIRECTION = 'facets';
-const RANK = { facets: '首選', meet: '次選', story: '備選' };
+const DIRECTIONS = ['meet', 'facets', 'story', 'friends'];
+const DEFAULT_DIRECTION = 'friends';
+const RANK = { friends: '定案', facets: '原首選', meet: '次選', story: '備選' };
 const store = {
   get(k) {
     try {

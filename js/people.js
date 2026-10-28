@@ -10,6 +10,8 @@
 export const PEOPLE = [
   {
     id: 'chen',
+    /** Their paper puppet (js/cast.js): on their card's Chinese face, and on the previous teammate's English face. */
+    puppet: 'tuck',
     /** Their own short address: <CARD_BASE>ncc */
     short: 'ncc',
     zh: '陳念誠',
@@ -23,6 +25,7 @@ export const PEOPLE = [
   },
   {
     id: 'hsiao',
+    puppet: 'tag',
     short: 'liball',
     zh: '蕭力文',
     en: 'Li-Wen Hsiao',
@@ -34,6 +37,7 @@ export const PEOPLE = [
   },
   {
     id: 'fang',
+    puppet: 'dot',
     short: 'nunu',
     zh: '方昱晴',
     en: 'Yu-Ching Fang',
@@ -45,6 +49,7 @@ export const PEOPLE = [
   },
   {
     id: 'cheng',
+    puppet: 'card',
     short: 'ted',
     zh: '鄭義信',
     en: 'Yi-Hsin Cheng',
@@ -56,6 +61,7 @@ export const PEOPLE = [
   },
   {
     id: 'xue',
+    puppet: 'night',
     short: 'winnie',
     zh: '薛惠馨',
     // Her English name, which she goes by (the others' are their passports' romanisation), and her spelling of 薛.

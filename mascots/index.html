@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>名片吉祥物方案</title>
+<link rel="icon" href="../assets/icon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,800;1,400;1,600&display=swap">
+<link rel="stylesheet" href="../css/base.css">
+<link rel="stylesheet" href="../directions/facets.css">
+<link rel="stylesheet" href="../directions/friends.css">
+<link rel="stylesheet" href="proposal.css">
+<script>if (new URLSearchParams(location.search).has('still')) document.documentElement.classList.add('still');</script>
+<script src="https://cdn.jsdelivr.net/npm/qrcode-generator@2.0.4/dist/qrcode.js"></script>
+<script type="module" src="proposal.js"></script>
+</head>
+<body>
+<main class="mp">
+  <h1>名片 × 吉祥物</h1>
+  <p class="lede">把首頁的五隻紙偶放上名片。卡面是名片專案真正的印刷稿（陳念誠），吉祥物用的是首頁同一組部件。每張圖左邊是正面（中文）、右邊是背面（英文），中間那條線就是兩面共用的長邊。最上面是定案的方向，下面是第一輪以 B 兩面為底的五個方案。</p>
+
+  <section id="fuse">
+    <h2><span class="option__letter">★</span>相遇＋融合<small>Paper Friends</small><span class="pick">定案</span></h2>
+    <div class="option">
+      <div><div data-slot="fuse"></div><p class="caption">正面　｜　背面</p></div>
+      <div>
+        <p>方案 4 的相遇，加回小小的融合。這就是現在的數位名片和印刷檔（名片專案的 D，<code>directions/friends.js</code>）。</p>
+        <dl class="spec">
+          <dt>右上的融合</dt><dd>中文面右上一對小泡泡：桃色和薰衣草融成約 15 × 13 mm 的一團，顏色用名片原本從桃色經過暖粉到薰衣草的過渡</dd>
+          <dt>穿過長邊的泡泡</dt><dd>正面在紙偶的左邊、背面在紙偶的右邊，中心壓在那條長邊上（正面的左緣就是背面的右緣），約 49–64 mm 高，比較高瘦的一團，兩面露出的地方剛好接起來；背面離 QR 碼 6 mm</dd>
+          <dt>它的顏色</dt><dd>這張名片兩隻紙偶都沒穿的主題色，依天空藍、鼠尾草綠、奶油黃的順序挑。陳念誠這張是摺摺和牽牽，所以是奶油黃</dd>
+          <dt>共振波浪</dt><dd>三條線從正面的右緣繞到背面的左緣，是同一條曲線，翻過來就接在一起（不考慮紙的厚度）。高度在兩隻舉起的手套之間</dd>
+          <dt>站的位置</dt><dd>每隻依實際畫到的範圍擺放：揮手那隻的手套離波浪線 2.5 mm，揮到最開也一樣。比較寬的聆聆、悄悄會自己往外站，比較瘦的牽牽會往長邊靠</dd>
+          <dt>幾隻</dt><dd>兩隻：中文面自己的、英文面下一位隊友的，五張名片接成一圈</dd>
+          <dt>數位版</dt><dd>一面轉到眼前，右上兩團從分開慢慢融成一團，那一面的紙偶揮三下手，波浪線一明一滅兩次；之後只偶爾眨眼</dd>
+        </dl>
+      </div>
+    </div>
+    <h3 class="ring-title">五張名片接成一圈</h3>
+    <p class="lede">每張正面是自己的那一隻，背面是下一位隊友的那一隻。誰配哪一隻先這樣暫定，之後每個人可以自己挑（<code>js/people.js</code> 的 <code>puppet</code>）</p>
+    <div class="team" data-slot="team" data-option="fuse"></div>
+  </section>
+
+  <section>
+    <h2>第一輪：先回答四個問題</h2>
+    <div class="answers">
+      <div><b>融合要不要留</b>要留，也不要縮小。融合是這張名片的概念本身，也是你最喜歡的畫面。首頁也是這樣分工：泡泡是一直都在的場地，紙偶是來訪的客人。方案 4 把它拿掉，給你比較。</div>
+      <div><b>放在哪裡</b>背面 QR 碼的正上方。名字和融合都不用動，它站在那裡還有任務：把人帶到 QR 碼。視線從名字、融合一路走到它，再到 QR 碼，它是最後一站，不搶名字。</div>
+      <div><b>放幾隻</b>一張一隻。五個人剛好五隻很誘人，但我們傾向五張都放同一隻（牽牽），理由在下面「一人一隻嗎」。</div>
+      <div><b>多大</b>牽牽連蝴蝶結約 17 mm，拿在一臂外看起來和首頁手機版差不多大。小於 11 mm 臉只剩幾個點，大於 20 mm 就比名字還重。</div>
+    </div>
+  </section>
+
+  <section>
+    <h2>現在的名片</h2>
+    <div class="option">
+      <div><div data-slot="now"></div><p class="caption">正面　｜　背面</p></div>
+      <div>
+        <p>中文名直排、一枚落款印，一團桃色從正面右緣穿出、在背面左緣接上，每一面的薰衣草色靠過來和它融成一團。正面右上和背面 QR 碼上方是目前的留白。</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="one">
+    <h2><span class="option__letter">1</span>陪你<small>Companion</small></h2>
+    <div class="option">
+      <div><div data-slot="one"></div><p class="caption">正面　｜　背面</p></div>
+      <div>
+        <p>自己的那一隻坐在正面的泡泡上，朝你揮手。背面不變</p>
+        <dl class="spec">
+          <dt>融合</dt><dd>保留，泡泡變成它坐的小山</dd>
+          <dt>幾隻</dt><dd>一隻</dd>
+          <dt>大小</dt><dd>摺摺身高 15 mm</dd>
+          <dt>位置</dt><dd>正面，泡泡頂端靠右，腳垂在泡泡前面</dd>
+          <dt>數位版</dt><dd>兩團融合之後，它從泡泡後面冒出來坐好、揮手，之後偶爾眨眼</dd>
+          <dt>印刷</dt><dd>正面多一個彩色圖層</dd>
+        </dl>
+        <ul class="pros"><li>正面一看就有它，最直接</li></ul>
+        <ul class="cons"><li>平滑的漸層上坐著一張有紙紋的剪紙，像貼紙貼在印刷品上</li><li>融合動畫時薰衣草會從它身上掃過，它得等融合跑完才能出現</li><li>正面的臉會比名字先被看見</li></ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="hand">
+    <h2><span class="option__letter">2</span>遞卡<small>Handing over</small><span class="pick">推薦</span></h2>
+    <div class="option">
+      <div><div data-slot="hand"></div><p class="caption">正面　｜　背面</p></div>
+      <div>
+        <p>正面完全不動。背面 QR 碼正上方站一隻牽牽：一張背面寫著「給：」、一直想把什麼交到某人手上的吊牌，就是名片被遞出去的那一刻</p>
+        <dl class="spec">
+          <dt>融合</dt><dd>保留，不動，也不碰到它（相隔 9 mm 以上）</dd>
+          <dt>幾隻</dt><dd>一隻，五張都是牽牽（也可以一人一隻，見最下面）</dd>
+          <dt>大小</dt><dd>連蝴蝶結約 17 mm</dd>
+          <dt>位置</dt><dd>右緣和 QR 碼、波紋標記對齊；腳離 QR 碼 2.8 mm，QR 碼周圍兩格的留白完全空著</dd>
+          <dt>數位版</dt><dd>翻到背面、融合跑完後，它從 QR 碼後面升上來，先露出背面的「給：」，再轉過身揮手。之後只眨眼、看游標，點它會跳一下</dd>
+          <dt>印刷</dt><dd>背面多一個圖層，用 600 dpi 重新匯出；眼睛和筆線用文字同一個暖黑</dd>
+        </dl>
+        <ul class="pros"><li>名字、落款印、融合都一模一樣，B 兩面原本的設計完整保留</li><li>它在卡上有任務：把人帶到 QR 碼；翻面才看得到，是給翻過來的人的小驚喜</li><li>牽牽的赤陶色蝴蝶結呼應落款印和波紋標記</li></ul>
+        <ul class="cons"><li>正面沒有吉祥物，只看正面的人不會知道它在</li></ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="round">
+    <h2><span class="option__letter">3</span>繞到背面<small>Round the edge</small></h2>
+    <div class="option">
+      <div><div data-slot="round"></div><p class="caption">正面　｜　背面</p></div>
+      <div>
+        <p>方案 2 再多一步：正面它從共用的長邊後面探出大半個身體，翻過來它整隻站在 QR 碼上面</p>
+        <dl class="spec">
+          <dt>融合</dt><dd>保留；正面它的腳踩在泡泡穿過長邊的地方</dd>
+          <dt>幾隻</dt><dd>一隻，兩面都有（這裡用摺摺）</dd>
+          <dt>大小</dt><dd>摺摺身高 15.5 mm</dd>
+          <dt>位置</dt><dd>正面右上，被長邊切掉一部分；背面同方案 2</dd>
+          <dt>數位版</dt><dd>正面它從邊緣後面探出來揮手；翻面時它跟著繞過去，在 QR 碼上面等你</dd>
+          <dt>印刷</dt><dd>正面被切掉的那部分一直畫進出血，裁切偏 1 mm 只是多露或少露一點</dd>
+        </dl>
+        <ul class="pros"><li>和桃色一樣「穿過那條邊」，翻面變成一個小故事</li></ul>
+        <ul class="cons"><li>兩面都有臉，臉會比名字先被看見，名片往角色周邊的方向走</li><li>正面它踩在泡泡上，和方案 1 一樣有貼紙感</li></ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="meet">
+    <h2><span class="option__letter">4</span>相遇<small>Meeting</small></h2>
+    <div class="option">
+      <div><div data-slot="meet"></div><p class="caption">正面　｜　背面</p></div>
+      <div>
+        <p>拿掉泡泡，讓兩隻吉祥物來演「融合」：正面是你的那一隻，背面是下一位隊友的，兩隻隔著長邊揮手，三條波浪線穿過那條邊</p>
+        <dl class="spec">
+          <dt>融合</dt><dd>拿掉，由兩隻相遇取代；長邊仍刷桃色</dd>
+          <dt>幾隻</dt><dd>兩隻（五張名片接成一圈）</dd>
+          <dt>大小</dt><dd>摺摺身高 20 mm</dd>
+          <dt>數位版</dt><dd>翻面時兩隻輪流揮手，再一起輕輕上下擺動，三條波浪線一明一滅，就是首頁兩隻相遇時的「共振」</dd>
+          <dt>印刷</dt><dd>沒有大片淡色漸層，CMYK 偏灰的風險變小</dd>
+        </dl>
+        <ul class="pros"><li>最可愛、最有故事，版面最乾淨</li></ul>
+        <ul class="cons"><li>失去名片上最有品牌感的融合畫面，整張卡從工作室的名片變成角色周邊</li><li>兩面分開看時，各自只有一隻在揮手，要翻過來或攤開才看得到相遇</li></ul>
+        <p class="note">中間做法（評審提的）：保留桃色穿過長邊，只把兩面的薰衣草換成吉祥物，牠伸手碰到桃色，碰到的地方畫三條小波浪。</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="crew">
+    <h2><span class="option__letter">5</span>小隊<small>The Crew</small></h2>
+    <div class="option">
+      <div><div data-slot="crew"></div><p class="caption">正面　｜　背面</p></div>
+      <div>
+        <p>五隻一起坐在正面的泡泡上，像爬上山坡的一排，你的那一隻在中間揮手</p>
+        <dl class="spec">
+          <dt>融合</dt><dd>保留，泡泡變成大家坐的山坡</dd>
+          <dt>幾隻</dt><dd>五隻</dd>
+          <dt>大小</dt><dd>每隻 8.5 mm，自己的 9.5 mm</dd>
+          <dt>數位版</dt><dd>一隻接一隻冒出來坐好，最後中間那隻揮手</dd>
+        </dl>
+        <ul class="pros"><li>「共振小隊」一眼就看得到</li></ul>
+        <ul class="cons"><li>最擠，和直排的名字搶視線</li><li>每隻都小於 11 mm，一臂外看不清臉，銅釘、腮紅印出來會糊成一點</li></ul>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>一人一隻嗎</h2>
+    <p class="lede">方案 2 換成每個人各一隻（配對只是暫定）。五個人剛好五隻很誘人，但我們傾向五張都放牽牽：</p>
+    <ul class="cons">
+      <li>綁定等於給每個人一個性格標籤（最小的、愛睡的），關於我們頁刻意不寫職稱，這有點像換個方式寫職稱</li>
+      <li>印出來份量不同：悄悄的深藍會比名字還重，點點的奶油黃在米色紙上最淡，聆聆寬 1.4 倍，放進同一格只剩 9 mm 高</li>
+      <li>B 兩面的規則是每個名字同一種做法（同一團桃色、同一條刷色的邊），同一隻紙偶正好延續</li>
+      <li>團隊有第六個人時，不必等新角色</li>
+    </ul>
+    <p>真要一人一隻，就讓每個人自己挑「喜歡的那隻」，而不是由誰分配「你是哪隻」，每隻都先打樣。</p>
+    <div class="team" data-slot="team" data-option="hand"></div>
+  </section>
+
+  <section>
+    <h2>印刷要注意</h2>
+    <ul class="cons">
+      <li>紙偶是全彩點陣圖，只能走數位 CMYK；改走專色或 Riso 的話要用那幾個油墨重畫</li>
+      <li>從 rig 重新匯出 600 dpi；小於 0.15 mm 的紙紋斑點印出來只是網點雜訊，印刷版拿掉</li>
+      <li>奶油色手套在米色棉紙上幾乎看不見，要加深一階或留住鉛筆輪廓</li>
+      <li>0.7 mm 的眼睛用四色印會套不準，臉上的筆線改成單一暖黑</li>
+      <li>膠水陰影是很淡的網點，棉紙吸墨會變深，一定要在實際的紙上打樣</li>
+    </ul>
+    <p class="note">還有一條路：紙本完全不動，吉祥物只出現在數位名片上（例如沿著卡片上緣走進來坐下，翻面時跳一下）。缺點是沒掃 QR 碼的人永遠看不到牠們。</p>
+  </section>
+</main>
+</body>
+</html>

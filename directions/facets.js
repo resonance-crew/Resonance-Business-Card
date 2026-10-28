@@ -1582,3 +1582,6 @@ function enFace(ctx) {
       <p class="fct-colophon"><span>${brand.team.en}</span><span class="fct-site">${brand.site}</span></p>
     </div>`;
 }
+
+// The faces' type, for the direction that keeps this layout (directions/friends.js).
+export { zhFace, enFace, typeIn };
