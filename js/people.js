@@ -22,6 +22,27 @@ export const PEOPLE = [
     photo: 'assets/team/chen.webp',
     email: 'ncc@resonance.channel',
     seed: 11,
+    /**
+     * A card page of their own (card.html): their links in place of the three buttons, as their own site has
+     * them (ncchen99.github.io, its first page) and GitHub, and the e-mail copied on a tap. Without it, the page
+     * is the team's: save the contact, copy the e-mail, see Resonance's About page.
+     */
+    personal: {
+      links: [
+        {
+          kind: 'resonance',
+          label: { zh: '共振 Resonance', en: 'Resonance' },
+          href: {
+            zh: 'https://resonance.channel/zh-TW/u/%E5%BF%B5%E8%AA%A0',
+            en: 'https://resonance.channel/en/u/%E5%BF%B5%E8%AA%A0',
+          },
+        },
+        { kind: 'instagram', label: 'Instagram', href: 'https://www.instagram.com/ncchen.foss/' },
+        { kind: 'facebook', label: 'Facebook', href: 'https://www.facebook.com/ncchen99' },
+        // Not on their site (yet): the owner asked for it on the card, 2026-10-28.
+        { kind: 'github', label: 'GitHub', href: 'https://github.com/ncchen99' },
+      ],
+    },
   },
   {
     id: 'hsiao',

@@ -503,3 +503,63 @@ export function organicLink(a, { seed = seedFromString(a.getAttribute('href') ||
     },
   };
 }
+
+/**
+ * The site's toast (molecules/Toast on atoms/InkPill, size md): a word over the foot of the window that
+ * something happened, made as a card is — the accent's light wash inside one hand-drawn pen line of the
+ * accent, a card's corners (16), flat, no shadow — centred clear of the home indicator, 4 s, scaling in
+ * over 180 ms and fading out over 140. One live region, there from the start, speaks it; the face is
+ * silent. Returns show(message): a new word replaces the one showing.
+ */
+export function organicToast({ seed = 41, ms = 4000 } = {}) {
+  const region = document.createElement('p');
+  region.className = 'o-toast-region';
+  region.setAttribute('role', 'status');
+  region.setAttribute('aria-live', 'polite');
+  const host = document.createElement('div');
+  host.className = 'o-toast-host';
+  host.hidden = true;
+  document.body.append(region, host);
+  let stop = null;
+  let timer = 0;
+  let leave = 0;
+  return function show(message) {
+    clearTimeout(timer);
+    clearTimeout(leave);
+    stop?.();
+    const face = document.createElement('div');
+    face.className = 'o-toast';
+    face.dataset.shapePending = '';
+    face.setAttribute('aria-hidden', 'true');
+    const svg = svgEl('svg', { class: 'o-face', 'aria-hidden': 'true', focusable: 'false' });
+    const path = svgEl('path', { class: 'o-toast-pen', 'stroke-width': INK, 'stroke-linejoin': 'round' });
+    svg.append(path);
+    const label = document.createElement('span');
+    label.className = 'o-toast-label';
+    label.textContent = message;
+    face.append(svg, label);
+    host.replaceChildren(face);
+    delete host.dataset.leaving;
+    host.hidden = false;
+    stop = measured(face, (w, h) => {
+      if (!w || !h) return;
+      svg.setAttribute('width', w);
+      svg.setAttribute('height', h);
+      svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
+      path.setAttribute('d', wobRect(w, h, 16, seed, 1.2, { segmentsH: 2, segmentsV: 1, curve: 1.4 }));
+      delete face.dataset.shapePending;
+    });
+    // Said again even when the words are the same, so a second copy is heard too.
+    region.textContent = '';
+    requestAnimationFrame(() => (region.textContent = message));
+    timer = setTimeout(() => {
+      host.dataset.leaving = '';
+      leave = setTimeout(() => {
+        host.hidden = true;
+        stop?.();
+        stop = null;
+        host.replaceChildren();
+      }, 140);
+    }, ms);
+  };
+}

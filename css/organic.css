@@ -167,3 +167,91 @@
   .o-wash-ink { transition-duration: 0ms !important; }
   .o-link-line { transition: none; }
 }
+
+/* ── the toast (molecules/Toast + atoms/InkPill md) ───────── */
+:root {
+  /* The site's --color-terracotta-light inside a --color-terracotta pen, its words the terracotta ink. */
+  --o-toast-fill: oklch(88% 0.08 55);
+  --o-toast-pen: oklch(62% 0.14 45);
+  --o-toast-ink: var(--o-on-tonal);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --o-toast-fill: var(--accent-tint);
+    --o-toast-pen: var(--accent);
+    --o-toast-ink: var(--accent-ink);
+  }
+}
+:root[data-theme='dark'] {
+  --o-toast-fill: var(--accent-tint);
+  --o-toast-pen: var(--accent);
+  --o-toast-ink: var(--accent-ink);
+}
+/* Over the foot of the window, centred, clear of the home indicator; as wide as its words, up to
+   440 px and never past the window's 16 px gutters. */
+.o-toast-host {
+  position: fixed;
+  left: 50%;
+  bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+  z-index: 950;
+  display: flex;
+  justify-content: center;
+  width: max-content;
+  max-width: min(440px, calc(100vw - 32px));
+  transform: translateX(-50%);
+}
+.o-toast-host[hidden] { display: none; }
+.o-toast-host[data-leaving] { pointer-events: none; }
+@media (max-width: 640px) {
+  .o-toast-host { bottom: calc(16px + env(safe-area-inset-bottom, 0px)); }
+}
+.o-toast {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 11px 20px;
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.35;
+  text-align: center;
+  color: var(--o-toast-ink);
+  animation: o-toast-in 180ms ease-out;
+}
+.o-toast .o-face { position: absolute; top: 0; left: 0; overflow: visible; pointer-events: none; z-index: 0; }
+.o-toast-pen { fill: var(--o-toast-fill); stroke: var(--o-toast-pen); }
+/* Until measured, a plain card of its own fill and pen (the site's .res-shape-stand-in). */
+.o-toast[data-shape-pending] {
+  background: var(--o-toast-fill);
+  border: 1.8px solid var(--o-toast-pen);
+  border-radius: 16px;
+}
+.o-toast-label { position: relative; z-index: 1; }
+.o-toast-host[data-leaving] .o-toast { animation: o-toast-out 140ms ease-in forwards; }
+@keyframes o-toast-in {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+@keyframes o-toast-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+/* Heard, not seen: the one live region every toast speaks through. */
+.o-toast-region {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+@media (prefers-reduced-motion: reduce) {
+  .o-toast, .o-toast-host[data-leaving] .o-toast { animation: none; }
+  .o-toast-host[data-leaving] { display: none; }
+}
