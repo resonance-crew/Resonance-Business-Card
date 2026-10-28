@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>濃淡打樣</title>
+<!-- One A4 sheet to print on the card's real stock before the run: direction D's blobs at the three strengths of
+     directions/friends.js TINTS, one row each, on three faces at true size (the melted pair and all three edge
+     inks: 陳念誠's and 方昱晴's Chinese faces, 鄭義信's English face). No paper flood: the stock is the paper.
+     tools/tint-proof.mjs prints it to print/friends/tint-proof.pdf. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,800;1,400;1,600&display=swap">
+<link rel="stylesheet" href="../css/base.css">
+<link rel="stylesheet" href="../directions/friends.css">
+<script src="https://cdn.jsdelivr.net/npm/qrcode-generator@2.0.4/dist/qrcode.js"></script>
+<style>
+  @page { size: 210mm 297mm; margin: 0; }
+  html, body { margin: 0; background: #fff; }
+  * { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  .sheet {
+    width: 210mm;
+    height: 297mm;
+    box-sizing: border-box;
+    padding: 9.5mm 13mm;
+    display: grid;
+    grid-template-rows: repeat(3, 90mm);
+    gap: 4mm;
+  }
+  .row { display: grid; grid-template-columns: 10mm repeat(3, 54mm); column-gap: 6mm; align-items: start; }
+  .label {
+    writing-mode: vertical-rl;
+    font: 500 8pt/1.4 'Noto Sans TC', 'DM Sans', sans-serif;
+    color: oklch(26% 0.03 60);
+    letter-spacing: 0.08em;
+  }
+  .label small { font-weight: 400; color: oklch(47% 0.04 70); }
+  .cell .flat-card { position: relative; width: 54mm; height: 90mm; container-type: inline-size; overflow: hidden; outline: 0.1mm solid oklch(80% 0.01 70); }
+  .cell .face { position: absolute; inset: 0; }
+</style>
+<script type="module">
+  import { withTint, TINTS } from '../directions/friends.js';
+  import { makeCtx, flatFace, faceParts, fontsSettled } from '../js/ctx.js';
+
+  /** The faces each row shows: [person, face]. */
+  const CELLS = [
+    ['chen', 'zh'],
+    ['fang', 'zh'],
+    ['cheng', 'en'],
+  ];
+  const sheet = document.querySelector('.sheet');
+  for (const [id, tint] of Object.entries(TINTS)) {
+    const row = document.createElement('div');
+    row.className = 'row';
+    const label = document.createElement('p');
+    label.className = 'label';
+    label.innerHTML = `${tint.label}${id === 'soft' ? '（目前的名片）' : ''}<small>　桃 ${tint.peach}・薰衣草 ${tint.lavender}・長邊泡泡 ${tint.edge}</small>`;
+    row.appendChild(label);
+    for (const [person, k] of CELLS) {
+      const dir = withTint(id);
+      const cards = {};
+      for (const side of ['front', 'back']) {
+        const fc = document.createElement('div');
+        fc.className = 'flat-card';
+        fc.style.cssText = '--trim-w: 54; --trim-h: 90';
+        fc.appendChild(flatFace(side));
+        cards[side] = fc;
+      }
+      dir.mount(
+        { front: faceParts(cards.front.firstChild), back: faceParts(cards.back.firstChild) },
+        makeCtx(dir, 'print', { personId: person }),
+      );
+      // 中文面在前: the Chinese face is the front.
+      const cell = document.createElement('div');
+      cell.className = 'cell';
+      cell.appendChild(k === 'zh' ? cards.front : cards.back);
+      row.appendChild(cell);
+    }
+    sheet.appendChild(row);
+  }
+  await Promise.all(
+    [...document.images].map(
+      (im) => new Promise((r) => (im.complete ? r() : (im.addEventListener('load', r, { once: true }), im.addEventListener('error', r, { once: true })))),
+    ),
+  );
+  await fontsSettled(document.body);
+  document.documentElement.dataset.ready = '1';
+</script>
+</head>
+<body>
+<div class="sheet"></div>
+</body>
+</html>

@@ -4,7 +4,7 @@
  * is directions/friends.js itself; the first round's options are B 兩面 with puppets laid over it.
  */
 import facets from '../directions/facets.js';
-import friends from '../directions/friends.js';
+import friends, { withTint, TINTS } from '../directions/friends.js';
 import { makeCtx, flatFace, faceParts, fontsSettled } from '../js/ctx.js';
 import { PEOPLE } from '../js/people.js';
 import { puppetEl, NAMES } from '../js/puppet.js';
@@ -320,6 +320,20 @@ async function build() {
         opt.id === 'fuse' ? `${p.zh}　正面 ${n.zh}・背面 ${NAMES[PAIRING[next(id)]].zh}` : `${p.zh} × ${n.zh} ${n.en}`;
       fig.appendChild(cap);
       team.appendChild(fig);
+    }
+  }
+
+  // D at its three strengths (friends.js TINTS), on 陳念誠's card.
+  const tints = document.querySelector('[data-slot="tints"]');
+  if (tints) {
+    for (const [id, tint] of Object.entries(TINTS)) {
+      const fig = document.createElement('figure');
+      fig.className = 'team-card';
+      fig.appendChild(spread('chen', { dir: withTint(id) }).el);
+      const cap = document.createElement('figcaption');
+      cap.textContent = `${tint.label}${id === 'soft' ? '（目前的名片）' : ''}`;
+      fig.appendChild(cap);
+      tints.appendChild(fig);
     }
   }
 
