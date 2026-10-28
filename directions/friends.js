@@ -21,7 +21,7 @@
  * Each puppet is placed by what it draws (js/puppet.js reach): its waving mitten stops HAND_GAP short of the
  * waves at both ends of the wave, whichever puppet it is, so a teammate who picks a wider one keeps clear too.
  */
-import { zhFace, enFace, typeIn } from './facets.js';
+import { zhFace, enFace, typeIn, grainTile } from './facets.js';
 import { puppetEl, reach } from '../js/puppet.js';
 
 const TAU = Math.PI * 2;
@@ -65,9 +65,17 @@ const LAVENDER_ALPHA = 0.78;
 const MID_CHROMA = 0.85;
 const HUE_LAG = 1.4;
 
-/** The blob round the other long edge (0.1 mm): its centre on that edge, a little taller than wide. */
-const EDGE_BLOB = { y: 570, R: 70, seed: 13, stretch: [0.8, 1.25] };
+/**
+ * The blob round the other long edge (0.1 mm), a little taller than wide. Its centre is EDGE_SHIFT inside the
+ * English face, so the English face (its right middle open beside the QR code) holds most of it and the
+ * Chinese face a crescent; the two parts meet on the edge, the one blob cut by it.
+ */
+const EDGE_BLOB = { y: 530, R: 86, seed: 13, stretch: [0.9, 1.15] };
+const EDGE_SHIFT = 37;
 const EDGE_ALPHA = 0.9;
+
+/** Sand on the screen's blobs, as B lays it (the viewer's toggle scales it); print never has it. */
+const GRAIN = 0.18;
 /** Its ink: the first of these that neither puppet on the card wears. */
 const EDGE_INKS = ['sky', 'sage', 'yellow'];
 const WEARS = { tuck: 'sage', tag: 'sky', card: 'lavender', dot: 'yellow', night: 'sky' };
@@ -92,7 +100,7 @@ export default {
   notes: [
     {
       k: '概念',
-      v: '每張名片有兩隻紙偶：中文面是自己的，英文面是團隊名單上下一位的，五張名片接成一圈。牠們隔著共用的長邊打招呼，中間三條波浪線就是標誌的三道波，從一面繞過那條邊接到另一面。B 的融合縮小留下：中文面右上一對小泡泡融成一團，另一條長邊有一團泡泡從正面穿到背面',
+      v: '每張名片有兩隻紙偶：中文面是自己的，英文面是團隊名單上下一位的，五張名片接成一圈。牠們隔著共用的長邊打招呼，中間三條波浪線就是標誌的三道波，從一面繞過那條邊接到另一面。B 的融合縮小留下：中文面右上一對小泡泡融成一團；另一條長邊有一團泡泡穿過，它的中心在英文面裡，英文面露出大半、中文面露出一彎',
     },
     {
       k: '位置',
@@ -104,7 +112,7 @@ export default {
     },
     {
       k: '印刷',
-      v: '泡泡和波浪線是向量，紙偶是全尺寸的點陣圖（約 360 dpi 以上），只能走數位 CMYK。米色手套在米色紙上偏淡，正式印之前請在實際的紙上打樣',
+      v: '螢幕上的泡泡有 B 的沙沙顆粒，印刷不做。泡泡和波浪線是向量，紙偶是全尺寸的點陣圖（約 360 dpi 以上），只能走數位 CMYK。米色手套在米色紙上偏淡，正式印之前請在實際的紙上打樣',
     },
     {
       k: '動態',
@@ -164,38 +172,53 @@ export default {
 
     const worn = [WEARS[slug.zh], WEARS[slug.en]];
     const edgeInk = ink[EDGE_INKS.find((c) => !worn.includes(c)) ?? EDGE_INKS[0]];
-    const paint = handover(B, ink.paper, { color: PEACH, alpha: PEACH_ALPHA }, { color: ink.lavender, alpha: LAVENDER_ALPHA });
+    const handTo = handover(B, ink.paper, { color: PEACH, alpha: PEACH_ALPHA }, { color: ink.lavender, alpha: LAVENDER_ALPHA });
+    const handStops = Array.from({ length: 17 }, (_, i) => [i / 16, handTo(i / 16)]);
 
-    const pair = {};
+    // The blob round the other long edge: one blob, its centre EDGE_SHIFT inside the English face (and so the
+    // same distance beyond the Chinese face's edge), the same size, seed and moment on both.
+    const edgeShape = (k) => {
+      const inward = k === 'en' ? EDGE_SHIFT : -EDGE_SHIFT;
+      const x = wavesRight[k] ? inward : W * 10 - inward;
+      return { d: B.outlinePath([{ x, ...EDGE_BLOB }], STILL_TIME, box, 3), fill: onPaper(B, ink.paper, edgeInk, EDGE_ALPHA) };
+    };
+    const edge = { zh: edgeShape('zh'), en: edgeShape('en') };
+    // The melted pair on the Chinese face (mirrored when that face is behind), handed over across its length.
+    const pairAt = PAIR.map((b) => (wavesRight.zh ? b : { ...b, x: W * 10 - b.x }));
+    const pairShape = (k, t, cell) => {
+      const [A, C] = B.meeting(pairAt[0], pairAt[1], k);
+      const d = Math.hypot(C.x - A.x, C.y - A.y) || 1;
+      const [ux, uy] = [(C.x - A.x) / d, (C.y - A.y) / d];
+      return {
+        d: B.outlinePath([A, C], t, box, cell),
+        fill: { x1: A.x - ux * A.R * 0.6, y1: A.y - uy * A.R * 0.6, x2: C.x + ux * C.R * 0.6, y2: C.y + uy * C.R * 0.6, stops: handStops },
+      };
+    };
+
+    // Each face's art, back to front: its blobs (vector for the press; on screen a canvas with B's sand), the
+    // waves, the puppet.
+    const art = {};
     for (const k of ['zh', 'en']) {
-      const art = face[k].art;
-      art.textContent = '';
-      // The blob round the other long edge: centred on it, the same on both faces.
-      const edgeX = wavesRight[k] ? 0 : W * 10;
-      art.insertAdjacentHTML(
-        'beforeend',
-        B.blobSvg([{ x: edgeX, ...EDGE_BLOB, color: edgeInk, alpha: EDGE_ALPHA }], STILL_TIME, { box, paper: ink.paper, className: 'frd-art' }),
-      );
-      if (k === 'zh') {
-        const mirror = (b) => (wavesRight.zh ? b : { ...b, x: W * 10 - b.x });
-        pair.svg = meltLayer(box);
-        art.appendChild(pair.svg.el);
-        pair.blobs = PAIR.map(mirror);
-      }
-      art.insertAdjacentHTML('beforeend', wavesSvg(wavesRight[k], waveY, ink.terracotta));
+      const host = face[k].art;
+      host.textContent = '';
+      art[k] = ctx.mode === 'print' ? svgLayer(host, box) : canvasLayer(B, host, box, GRAIN * ctx.grain);
+      host.insertAdjacentHTML('beforeend', wavesSvg(wavesRight[k], waveY, ink.terracotta));
       const layer = document.createElement('div');
       layer.className = 'frd-pups';
       layer.appendChild(puppetEl(slug[k], pose[k]));
-      art.appendChild(layer);
+      host.appendChild(layer);
     }
-
-    const [A0, B0] = pair.blobs;
-    const drawPair = (k, t) =>
-      pair.svg.draw(B, B.meeting({ ...A0, color: PEACH, alpha: PEACH_ALPHA }, { ...B0, color: ink.lavender, alpha: LAVENDER_ALPHA }, k), t, box, paint);
+    art.en.draw([edge.en]);
+    const drawZh = (k, t, cell = 3) => art.zh.draw([edge.zh, pairShape(k, t, cell)]);
+    const done = () => {
+      art.zh.destroy();
+      art.en.destroy();
+      clear(face);
+    };
 
     if (!ctx.live) {
-      drawPair(MELT, STILL_TIME);
-      return { destroy: () => clear(face) };
+      drawZh(MELT, STILL_TIME);
+      return { destroy: done };
     }
 
     // ── screen: the face in view melts its pair (the Chinese face) and says hello ──
@@ -223,9 +246,9 @@ export default {
       clock = t;
       if (showing !== 'zh') return;
       const m = Math.max(0, Math.min(1, (t - meltAt) / MEET_TIME));
-      drawPair(MELT_FROM + (MELT - MELT_FROM) * B.smoothstep(m), t);
+      drawZh(MELT_FROM + (MELT - MELT_FROM) * B.smoothstep(m), t, 4);
     });
-    drawPair(MELT_FROM, STILL_TIME);
+    drawZh(MELT_FROM, STILL_TIME);
     const offSide = ctx.onSide((side) => {
       const k = side === zhSide ? 'zh' : 'en';
       if (k === showing) return;
@@ -241,7 +264,7 @@ export default {
         gone = true;
         stop();
         offSide();
-        clear(face);
+        done();
       },
     };
   },
@@ -267,33 +290,109 @@ function handover(B, paperCss, a, b) {
   };
 }
 
+/** A colour laid on the paper at `alpha` (as the blob engine mixes an ink with the paper), as hex. */
+function onPaper(B, paperCss, colour, alpha) {
+  const paper = B.parseOklch(paperCss);
+  return B.rgbHex(B.oklabToRgb(B.parseOklch(colour).map((c, i) => paper[i] + (c - paper[i]) * alpha)));
+}
+
+/*
+ * A face's blobs, drawn from shapes: { d (path data in 0.1 mm), fill: a colour, or a linear hand-over
+ * { x1, y1, x2, y2, stops: [[share, colour]] } }. For the press, vector (svgLayer); on screen, a canvas with
+ * B's sand laid inside each shape (canvasLayer, facets.js canvasArt's recipe: one grain per CSS pixel).
+ */
 let ids = 0;
-/** The melted pair's SVG, redrawn in place: its outline, and the hand-over across it from one blob's far side to the other's. */
-function meltLayer(box) {
-  const id = `frd-melt-${++ids}`;
-  const NS = 'http://www.w3.org/2000/svg';
-  const el = document.createElementNS(NS, 'svg');
+function svgLayer(host, box) {
+  const el = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
   el.setAttribute('class', 'frd-art');
   el.setAttribute('viewBox', `${box.x} ${box.y} ${box.w} ${box.h}`);
   el.setAttribute('preserveAspectRatio', 'none');
   el.setAttribute('aria-hidden', 'true');
-  el.innerHTML = `<defs><linearGradient id="${id}" gradientUnits="userSpaceOnUse"></linearGradient></defs><path fill="url(#${id})" fill-rule="evenodd"/>`;
-  const grad = el.querySelector('linearGradient');
-  const path = el.querySelector('path');
-  let stops = '';
+  host.appendChild(el);
+  const f = (n) => n.toFixed(1);
   return {
-    el,
-    draw(B, [A, C], t, bx, paint) {
-      if (!stops) stops = Array.from({ length: 17 }, (_, i) => `<stop offset="${(i / 16).toFixed(4)}" stop-color="${paint(i / 16)}"/>`).join('');
-      if (!grad.firstChild) grad.innerHTML = stops;
-      const d = Math.hypot(C.x - A.x, C.y - A.y) || 1;
-      const ux = (C.x - A.x) / d;
-      const uy = (C.y - A.y) / d;
-      grad.setAttribute('x1', (A.x - ux * A.R * 0.6).toFixed(1));
-      grad.setAttribute('y1', (A.y - uy * A.R * 0.6).toFixed(1));
-      grad.setAttribute('x2', (C.x + ux * C.R * 0.6).toFixed(1));
-      grad.setAttribute('y2', (C.y + uy * C.R * 0.6).toFixed(1));
-      path.setAttribute('d', B.outlinePath([A, C], t, bx, 4));
+    draw(shapes) {
+      el.innerHTML = shapes
+        .map(({ d, fill }) => {
+          if (typeof fill === 'string') return `<path d="${d}" fill="${fill}" fill-rule="evenodd"/>`;
+          const id = `frd-hand-${++ids}`;
+          const stops = fill.stops.map(([s, c]) => `<stop offset="${s.toFixed(4)}" stop-color="${c}"/>`).join('');
+          return (
+            `<defs><linearGradient id="${id}" gradientUnits="userSpaceOnUse" x1="${f(fill.x1)}" y1="${f(fill.y1)}" x2="${f(fill.x2)}" y2="${f(fill.y2)}">${stops}</linearGradient></defs>` +
+            `<path d="${d}" fill="url(#${id})" fill-rule="evenodd"/>`
+          );
+        })
+        .join('');
+    },
+    destroy() {},
+  };
+}
+
+function canvasLayer(B, host, box, grain) {
+  const canvas = document.createElement('canvas');
+  canvas.className = 'frd-canvas';
+  canvas.setAttribute('aria-hidden', 'true');
+  host.appendChild(canvas);
+  const g = canvas.getContext('2d');
+  let w = 0;
+  let h = 0;
+  let dpr = 1;
+  let pattern = null;
+  let last = null;
+  const fit = () => {
+    const cw = host.offsetWidth;
+    const ch = host.offsetHeight;
+    if (!cw || !ch) return false;
+    const d = Math.min(2.5, window.devicePixelRatio || 1);
+    if (cw === w && ch === h && d === dpr) return true;
+    w = cw;
+    h = ch;
+    dpr = d;
+    canvas.width = Math.round(w * dpr);
+    canvas.height = Math.round(h * dpr);
+    return true;
+  };
+  const paint = () => {
+    if (!last || !fit()) return;
+    g.setTransform(1, 0, 0, 1, 0, 0);
+    g.globalAlpha = 1;
+    g.clearRect(0, 0, canvas.width, canvas.height);
+    const sx = canvas.width / box.w;
+    const sy = canvas.height / box.h;
+    for (const { d, fill } of last) {
+      g.save();
+      g.setTransform(sx, 0, 0, sy, -box.x * sx, -box.y * sy);
+      g.clip(new Path2D(d), 'evenodd');
+      if (typeof fill === 'string') g.fillStyle = fill;
+      else {
+        const grad = g.createLinearGradient(fill.x1, fill.y1, fill.x2, fill.y2);
+        for (const [s, c] of fill.stops) grad.addColorStop(s, c);
+        g.fillStyle = grad;
+      }
+      g.fillRect(box.x, box.y, box.w, box.h);
+      if (grain > 0) {
+        pattern = pattern || g.createPattern(grainTile(B), 'repeat');
+        const px = Math.max(1, Math.round(dpr));
+        g.setTransform(px, 0, 0, px, 0, 0);
+        g.imageSmoothingEnabled = false;
+        g.globalAlpha = grain;
+        g.fillStyle = pattern;
+        g.fillRect(0, 0, canvas.width / px, canvas.height / px);
+      }
+      g.restore();
+    }
+  };
+  // A still frame is drawn once: draw it again when the card changes size (or had none yet).
+  const ro = new ResizeObserver(() => paint());
+  ro.observe(host);
+  return {
+    draw(shapes) {
+      last = shapes;
+      paint();
+    },
+    destroy() {
+      ro.disconnect();
+      canvas.remove();
     },
   };
 }

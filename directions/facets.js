@@ -1584,4 +1584,4 @@ function enFace(ctx) {
 }
 
 // The faces' type, for the direction that keeps this layout (directions/friends.js).
-export { zhFace, enFace, typeIn };
+export { zhFace, enFace, typeIn, grainTile };
