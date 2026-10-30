@@ -169,9 +169,9 @@ function mountCard(faces, ctx, tint) {
   face.en.content.innerHTML = enFace(ctx);
   const typeLoaded = ctx.typeReady ?? typeIn(ctx);
 
-  // This card's puppet on the Chinese face, the next teammate's on the English face.
+  // This card's puppet on the Chinese face, the next teammate's on the English face (unless they picked their own).
   const i = people.findIndex((p) => p.id === person.id);
-  const slug = { zh: person.puppet ?? 'tuck', en: people[(i + 1) % people.length].puppet ?? 'tag' };
+  const slug = { zh: person.puppet ?? 'tuck', en: person.backPuppet ?? people[(i + 1) % people.length].puppet ?? 'tag' };
 
   // Each waves the arm on the waves' side, placed so that mitten stops HAND_GAP short of them.
   const poseOf = (k) => {

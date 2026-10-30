@@ -1,16 +1,16 @@
 /**
  * The card as the person you gave it to sees it: card.html#<person>.
- * One card on a desk, turned over with a tap; under it, save the contact,
- * copy the e-mail, and what Resonance is. The page speaks the visitor's
+ * One card on a desk, turned over with a tap; under it, their links, the
+ * e-mail (a tap copies it), and what Resonance is. The page speaks the visitor's
  * language (Chinese or English), and so does the card where it can.
  *
  *   card.html#chen            陳念誠's card, in the chosen direction
  *   card.html?d=facets#chen   another direction (local review)
  */
-import { PEOPLE, BRAND, waveMark, cardUrl } from './people.js';
+import { PEOPLE, waveMark } from './people.js';
 import { createCard3D } from './card3d.js';
 import { makeCtx, faceParts, loadDirection, fontsSettled } from './ctx.js';
-import { organicButton, organicBare, organicDivider, organicLink, organicToast, globeIcon, arrowUpRightIcon, INK_STRONG } from './organic.js';
+import { organicBare, organicDivider, organicLink, organicToast, globeIcon, INK_STRONG } from './organic.js';
 
 /** The direction the team picked. */
 export const DIRECTION = 'friends';
@@ -27,7 +27,7 @@ const MISSION = {
 };
 
 /**
- * The links of a page of one's own (people.js `personal`), each in a 24 × 24 box, stroked: the Resonance waves,
+ * A person's links (people.js `links`), each in a 24 × 24 box, stroked: the Resonance waves,
  * and Instagram, Facebook and GitHub as their own site draws them (ncchen99.github.io's outline icons; GitHub
  * from the same set). Not redrawn by hand: a brand's mark is read by its shape, and these outlines are a pen's
  * line already, round-capped like the waves beside them.
@@ -62,28 +62,18 @@ function stroked(inner) {
 const T = {
   zh: {
     hint: '點一下翻面',
-    save: '存到聯絡人',
-    copy: '複製 Email',
     copied: 'Email 已複製',
-    copyFailed: '無法自動複製，請長按選取 Email',
-    about: '認識共振',
     aboutTitle: '關於共振',
     other: 'English',
-    saved: '已下載聯絡人檔案',
     links: '在其他地方找到我',
     copyEmail: (email) => `複製 Email ${email}`,
     cantCopy: (email) => `無法自動複製：${email}`,
   },
   en: {
     hint: 'Tap to turn over',
-    save: 'Save contact',
-    copy: 'Copy e-mail',
     copied: 'E-mail copied',
-    copyFailed: 'Couldn’t copy. Press and hold the e-mail to select it',
-    about: 'About Resonance',
     aboutTitle: 'About Resonance',
     other: '中文',
-    saved: 'Contact file downloaded',
     links: 'Find me elsewhere',
     copyEmail: (email) => `Copy e-mail ${email}`,
     cantCopy: (email) => `Couldn’t copy: ${email}`,
@@ -102,8 +92,8 @@ const person =
   PEOPLE[0];
 const personId = person.id;
 const directionId = params.get('d') || DIRECTION;
-/** Their own page (their links) or the team's (the three buttons). */
-const personal = person.personal ?? null;
+/** Their links under the card (none until they've said yes). */
+const links = person.links ?? [];
 let ui = (params.get('ui') || navigator.language || 'zh').toLowerCase().startsWith('zh') ? 'zh' : 'en';
 
 const $ = (s) => document.querySelector(s);
@@ -146,29 +136,20 @@ async function render() {
   current = { card, ctx, instance };
 
   $('#hint').textContent = t.hint;
-  $('#save .o-label').textContent = t.save;
-  $('#copy .o-label').textContent = t.copy;
-  $('#about-link .o-label').firstChild.textContent = t.about;
-  $('#about-link').href = `${BRAND.url}/${ui === 'zh' ? 'zh-TW' : 'en'}/about`;
   $('#about-title').textContent = t.aboutTitle;
   $('#mission').textContent = MISSION[ui];
-  if (personal) {
-    $('#email .email-text').textContent = person.email;
-    $('#email').setAttribute('aria-label', t.copyEmail(person.email));
-    $('#links').setAttribute('aria-label', t.links);
-    for (const a of $('#links').querySelectorAll('a')) {
-      const link = personal.links[+a.dataset.index];
-      const label = typeof link.label === 'string' ? link.label : link.label[ui];
-      a.href = typeof link.href === 'string' ? link.href : link.href[ui];
-      a.setAttribute('aria-label', label);
-      a.title = label;
-    }
-  } else {
-    $('#email').textContent = person.email;
+  $('#email .email-text').textContent = person.email;
+  $('#email').setAttribute('aria-label', t.copyEmail(person.email));
+  $('#links').setAttribute('aria-label', t.links);
+  for (const a of $('#links').querySelectorAll('a')) {
+    const link = links[+a.dataset.index];
+    const label = typeof link.label === 'string' ? link.label : link.label[ui];
+    a.href = typeof link.href === 'string' ? link.href : link.href[ui];
+    a.setAttribute('aria-label', label);
+    a.title = label;
   }
   $('#lang .lang-label').textContent = t.other;
   $('#lang').lang = ui === 'zh' ? 'en' : 'zh-Hant';
-  $('#status').textContent = '';
   (typeset ? typeset.ready : fontsSettled(card.stage)).then(() => (document.documentElement.dataset.ready = '1'));
 }
 
@@ -225,32 +206,13 @@ function typeLayers(card, lang) {
   };
 }
 
-function vcard() {
-  const esc = (s) => String(s).replace(/([,;\\])/g, '\\$1');
-  const lines = [
-    'BEGIN:VCARD',
-    'VERSION:3.0',
-    `N:${esc(person.family)};${esc(person.given)};;;`,
-    `FN:${esc(person.zh)} ${esc(person.en)}`,
-    `NICKNAME:${esc(person.zh)}`,
-    `ORG:${esc(BRAND.name.zh)} ${esc(BRAND.name.en)}`,
-    `EMAIL;TYPE=INTERNET:${person.email}`,
-    `URL:${BRAND.url}`,
-    `URL;TYPE=card:${cardUrl(person)}`,
-    `NOTE:${esc(BRAND.headline.zh)} · ${esc(BRAND.headline.en)}`,
-    'END:VCARD',
-  ];
-  return lines.join('\r\n') + '\r\n';
-}
-
 /**
- * Their own page: the links where the three buttons were (each a 48 px target with the site's hover brush),
- * and the e-mail itself a button that copies it, said by the toast. The words are set by render().
+ * Under the card: their links (each a 48 px target with the site's hover brush), and the e-mail itself a
+ * button that copies it, said by the toast. The words are set by render().
  */
-function initPersonal() {
-  document.documentElement.dataset.layout = 'personal';
+function initContact() {
   const list = $('#links');
-  personal.links.forEach((link, i) => {
+  links.forEach((link, i) => {
     const li = document.createElement('li');
     const a = document.createElement('a');
     a.dataset.index = i;
@@ -261,14 +223,10 @@ function initPersonal() {
     list.append(li);
     organicBare(a, { seed: 71 + i * 12 });
   });
-  list.hidden = false;
+  list.hidden = links.length === 0;
 
-  const email = document.createElement('button');
-  email.type = 'button';
-  email.id = 'email';
-  email.className = 'share-email';
-  email.innerHTML = `<span class="email-text"></span><span class="copy-icon" aria-hidden="true">${stroked(COPY_ICON)}</span>`;
-  $('#email').replaceWith(email);
+  const email = $('#email');
+  email.querySelector('.copy-icon').innerHTML = stroked(COPY_ICON);
   organicBare(email, { seed: 29 });
   const toast = organicToast();
   email.addEventListener('click', async () => {
@@ -299,41 +257,13 @@ async function copyText(text) {
 
 function init() {
   $('#brand-mark').innerHTML = waveMark('currentColor', 1.8);
-  if (personal) initPersonal();
-  // The Resonance site's hand-drawn controls (js/organic.js): filled wobbly buttons, the frameless
-  // globe, a wavy rule, a pen's wavy underline. Seeds are the site's own, one per element.
+  initContact();
+  // The Resonance site's hand-drawn controls (js/organic.js): the frameless globe, a wavy rule, a pen's
+  // wavy underline. Seeds are the site's own, one per element.
   $('#lang').insertAdjacentHTML('afterbegin', globeIcon());
-  $('#about-link .o-arrow').innerHTML = arrowUpRightIcon();
   organicBare($('#lang'), { seed: 53 });
-  organicButton($('#save'), { variant: 'solid', seed: 3 });
-  organicButton($('#copy'), { variant: 'tonal', seed: 601 });
-  organicButton($('#about-link'), { variant: 'tonal', seed: 401 });
   organicDivider($('#about-rule'), { seed: 17 });
   organicLink($('#foot-link'));
-  $('#save').addEventListener('click', () => {
-    const blob = new Blob([vcard()], { type: 'text/vcard;charset=utf-8' });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = `${person.en.replace(/\s+/g, '-')}.vcf`;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    setTimeout(() => URL.revokeObjectURL(a.href), 4000);
-    $('#status').textContent = T[ui].saved;
-  });
-  $('#copy').addEventListener('click', async () => {
-    try {
-      await navigator.clipboard.writeText(person.email);
-      $('#status').textContent = T[ui].copied;
-    } catch {
-      const range = document.createRange();
-      range.selectNodeContents($('#email'));
-      const sel = getSelection();
-      sel.removeAllRanges();
-      sel.addRange(range);
-      $('#status').textContent = T[ui].copyFailed;
-    }
-  });
   $('#lang').addEventListener('click', () => {
     ui = ui === 'zh' ? 'en' : 'zh';
     render();

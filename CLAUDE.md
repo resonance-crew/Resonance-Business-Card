@@ -16,7 +16,7 @@ ES modules don't load from `file://`; always serve the folder.
 - `index.html` — the proposal page: direction tabs, the 3D card, people / language / motion / grain
   toggles, the print proof (both faces flat with bleed and crop marks), the mission statement.
 - `card.html#<person>` — the digital card as a recipient sees it (one person, the direction in `js/share.js` `DIRECTION`):
-  turn it over, save the contact (vCard), copy the e-mail, read what Resonance is. Speaks the visitor's language.
+  turn it over, their links (people.js `links`, a teammate's only once they've said yes), the e-mail (a tap copies it), what Resonance is. Speaks the visitor's language.
   Each person also has a short page, `<short>.html` (ncc, liball, nunu, ted, winnie), GENERATED from card.html by
   `node tools/short-pages.mjs` (run it after editing card.html or js/people.js). Hosted on GitHub Pages at the custom
   domain hi.resonance.channel (a DNS-only CNAME in Cloudflare); every printed card's QR code opens `CARD_BASE + short`.

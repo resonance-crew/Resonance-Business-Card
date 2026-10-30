@@ -10,7 +10,10 @@
 export const PEOPLE = [
   {
     id: 'chen',
-    /** Their paper puppet (js/cast.js): on their card's Chinese face, and on the previous teammate's English face. */
+    /**
+     * Their paper puppet (js/cast.js): on their card's Chinese face, and on the previous teammate's English face.
+     * `backPuppet` (optional) puts another on their own English face instead of the next teammate's.
+     */
     puppet: 'tuck',
     /** Their own short address: <CARD_BASE>ncc */
     short: 'ncc',
@@ -23,26 +26,24 @@ export const PEOPLE = [
     email: 'ncc@resonance.channel',
     seed: 11,
     /**
-     * A card page of their own (card.html): their links in place of the three buttons, as their own site has
-     * them (ncchen99.github.io, its first page) and GitHub, and the e-mail copied on a tap. Without it, the page
-     * is the team's: save the contact, copy the e-mail, see Resonance's About page.
+     * Their links under the card on their page (card.html), above the e-mail that a tap copies: as their own
+     * site has them (ncchen99.github.io, its first page) and GitHub. Kinds: resonance, instagram, facebook, github
+     * (js/share.js LINK_ICONS). Fill a teammate's only once they have said yes; without any, the e-mail stands alone.
      */
-    personal: {
-      links: [
-        {
-          kind: 'resonance',
-          label: { zh: '共振 Resonance', en: 'Resonance' },
-          href: {
-            zh: 'https://resonance.channel/zh-TW/u/%E5%BF%B5%E8%AA%A0',
-            en: 'https://resonance.channel/en/u/%E5%BF%B5%E8%AA%A0',
-          },
+    links: [
+      {
+        kind: 'resonance',
+        label: { zh: '共振 Resonance', en: 'Resonance' },
+        href: {
+          zh: 'https://resonance.channel/zh-TW/u/%E5%BF%B5%E8%AA%A0',
+          en: 'https://resonance.channel/en/u/%E5%BF%B5%E8%AA%A0',
         },
-        { kind: 'instagram', label: 'Instagram', href: 'https://www.instagram.com/ncchen.foss/' },
-        { kind: 'facebook', label: 'Facebook', href: 'https://www.facebook.com/ncchen99' },
-        // Not on their site (yet): the owner asked for it on the card, 2026-10-28.
-        { kind: 'github', label: 'GitHub', href: 'https://github.com/ncchen99' },
-      ],
-    },
+      },
+      { kind: 'instagram', label: 'Instagram', href: 'https://www.instagram.com/ncchen.foss/' },
+      { kind: 'facebook', label: 'Facebook', href: 'https://www.facebook.com/ncchen99' },
+      // Not on their site (yet): the owner asked for it on the card, 2026-10-28.
+      { kind: 'github', label: 'GitHub', href: 'https://github.com/ncchen99' },
+    ],
   },
   {
     id: 'hsiao',
@@ -55,6 +56,8 @@ export const PEOPLE = [
     photo: 'assets/team/hsiao.webp',
     email: 'liball@resonance.channel',
     seed: 37,
+    // Their social links wait for their go-ahead (2026-10-31).
+    links: [],
   },
   {
     id: 'fang',
@@ -67,6 +70,8 @@ export const PEOPLE = [
     photo: 'assets/team/fang.webp',
     email: 'yu-ching@resonance.channel',
     seed: 61,
+    // Their social links wait for their go-ahead (2026-10-31).
+    links: [],
   },
   {
     id: 'cheng',
@@ -79,10 +84,14 @@ export const PEOPLE = [
     photo: 'assets/team/cheng.webp',
     email: 'ted@resonance.channel',
     seed: 83,
+    // Their social links wait for their go-ahead (2026-10-31).
+    links: [],
   },
   {
     id: 'xue',
-    puppet: 'night',
+    // Her pick (2026-10-31): 點點 Pip on her Chinese face, and 聆聆 Nod on her English face in place of the ring's next.
+    puppet: 'dot',
+    backPuppet: 'card',
     short: 'winnie',
     zh: '薛惠馨',
     // Her English name, which she goes by (the others' are their passports' romanisation), and her spelling of 薛.
@@ -93,6 +102,8 @@ export const PEOPLE = [
     photo: null,
     email: 'winnie@resonance.channel',
     seed: 113,
+    // Their social links wait for their go-ahead (2026-10-31).
+    links: [],
   },
 ];
 
